@@ -497,11 +497,12 @@ details[open] summary::before{transform:rotate(90deg)}
         <div id="rows"></div>
       </details>
 
+      <!-- ВЫБОР ФОРМАТОВ СОХРАНЕНИЯ -->
       <div class="save-options">
         <span style="color:var(--muted);font-weight:500">При сохранении:</span>
-        <label class="chk on"><input type="checkbox" id="saveHtml" checked disabled> 📄 HTML-смета</label>
+        <label class="chk on"><input type="checkbox" id="saveHtml" checked> 📄 HTML-смета</label>
         <label class="chk on"><input type="checkbox" id="saveJson" checked> 🗄 JSON</label>
-        <label class="chk on"><input type="checkbox" id="saveCsv" checked disabled> 📊 Журнал CSV</label>
+        <label class="chk on"><input type="checkbox" id="saveCsv" checked> 📊 Журнал CSV</label>
       </div>
 
       <div class="actions" style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
@@ -523,8 +524,8 @@ details[open] summary::before{transform:rotate(90deg)}
 
 <script>
 const el = id => document.getElementById(id);
-const fmt = n => new Intl.NumberFormat('ru-RU').format(Math.round(n));
-const fmt2 = n => new Intl.NumberFormat('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
+const fmt = n => new Intl.NumberFormat('ru-RU').format(Math.round(n || 0));
+const fmt2 = n => new Intl.NumberFormat('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n || 0);
 const num = (v,d=0) => { const n = parseFloat(String(v).replace(',','.')); return isFinite(n)?n:d; };
 const pad = n => String(n).padStart(2,'0');
 const escHtml = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -945,8 +946,16 @@ let dirHandle = null;
 const FSA_SUPPORTED = 'showDirectoryPicker' in window;
 const PREF_KEY = 'offset_calc_prefs_v1';
 
-function loadPrefs(){ try{ return JSON.parse(localStorage.getItem(PREF_KEY) || '{}'); }catch(e){ return {}; } }
-function savePrefs(){ localStorage.setItem(PREF_KEY, JSON.stringify({ saveJson: el('saveJson').checked })); }
+function loadPrefs(){ 
+  try{ return JSON.parse(localStorage.getItem(PREF_KEY) || '{}'); }catch(e){ return {}; } 
+}
+function savePrefs(){ 
+  localStorage.setItem(PREF_KEY, JSON.stringify({ 
+    saveHtml: el('saveHtml').checked,
+    saveJson: el('saveJson').checked,
+    saveCsv: el('saveCsv').checked
+  })); 
+}
 
 function updateFolderUI(){
   const b = el('folderBtn');
@@ -1018,6 +1027,25 @@ function downloadFile(name, content, type){
   a.href = url; a.download = name;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 4000);
+}
+
+// ВОССТАНОВЛЕННАЯ функция для вывода тарифов в HTML-смете
+function buildCfgHtml(cfg){
+  if(!cfg) return '<i>нет данных</i>';
+  let h = '<div style="font-size:12px;line-height:1.7">';
+  const line = (l,v) => `<div style="display:flex;justify-content:space-between;border-bottom:1px dotted #eaeaea;padding:3px 0"><span>${escHtml(l)}</span><b>${v}</b></div>`;
+  h += line('Печатная форма', fmt(cfg.platePrice) + ' ₽');
+  h += line('Отходы на форму', fmt(cfg.wastePerForm) + ' л.');
+  h += line('Резка', fmt2(cfg.cut) + ' ₽/л.');
+  h += line('Биговка / фальцовка', fmt2(cfg.crease) + ' ₽/л.');
+  ['1+0','1+1','4+0','4+4'].forEach(k => { h += line('Печать ' + k + ' (₽/отт. А2)', fmt(cfg.printPrices[k]) + ' ₽'); });
+  Object.keys(cfg.paper).forEach(k=>{
+    const p = cfg.paper[k];
+    h += line(p.name, `${fmt(p.packSize)} л. · себест. ${fmt(p.packCost)} ₽ · клиент ${fmt(p.packPrice)} ₽`);
+  });
+  ['saddle','perfect','soft','hard'].forEach(k => { h += line(BINDING_NAMES[k], fmt(cfg.binding[k]) + ' ₽/шт'); });
+  h += '</div>';
+  return h;
 }
 
 function buildHtmlSmeta(snap){
@@ -1222,27 +1250,44 @@ function fileStamp(d){
 async function saveCalc(){
   const snap = buildSnapshot();
   const baseName = safeName(`${fileStamp(new Date())}_${snap.employee}_${snap.client || 'без клиента'}`);
-  const html = buildHtmlSmeta(snap);
-  const json = JSON.stringify(snap, null, 2);
-  const saveJson = el('saveJson').checked;
+  
+  const doHtml = el('saveHtml').checked;
+  const doJson = el('saveJson').checked;
+  const doCsv = el('saveCsv').checked;
+
+  if (!doHtml && !doJson && !doCsv) {
+    toast('Выберите хотя бы один формат для сохранения!', true);
+    return;
+  }
+
+  const html = doHtml ? buildHtmlSmeta(snap) : '';
+  const json = doJson ? JSON.stringify(snap, null, 2) : '';
 
   const dir = await ensureDir();
 
   if(dir){
     try{
-      await writeFileToDir(baseName + '.html', html, 'text/html;charset=utf-8');
-      if(saveJson) await writeFileToDir(baseName + '.json', json, 'application/json;charset=utf-8');
-      await appendCsv(csvLine(snap));
-      toast(`Сохранено в «${dir.name}»: HTML${saveJson ? ' + JSON' : ''} + CSV`);
+      if(doHtml) await writeFileToDir(baseName + '.html', html, 'text/html;charset=utf-8');
+      if(doJson) await writeFileToDir(baseName + '.json', json, 'application/json;charset=utf-8');
+      if(doCsv) await appendCsv(csvLine(snap));
+      
+      let savedList = [];
+      if(doHtml) savedList.push('HTML');
+      if(doJson) savedList.push('JSON');
+      if(doCsv) savedList.push('CSV');
+      toast(`Сохранено в «${dir.name}»: ${savedList.join(' + ')}`);
     }catch(e){
       toast('Ошибка записи: ' + e.message, true);
-      downloadFile(baseName + '.html', html, 'text/html');
-      if(saveJson) downloadFile(baseName + '.json', json, 'application/json');
+      if(doHtml) downloadFile(baseName + '.html', html, 'text/html');
+      if(doJson) downloadFile(baseName + '.json', json, 'application/json');
     }
   } else {
-    downloadFile(baseName + '.html', html, 'text/html');
-    if(saveJson) downloadFile(baseName + '.json', json, 'application/json');
-    toast(`Скачано в «Загрузки»: HTML${saveJson ? ' + JSON' : ''}`);
+    if(doHtml) downloadFile(baseName + '.html', html, 'text/html');
+    if(doJson) downloadFile(baseName + '.json', json, 'application/json');
+    let savedList = [];
+    if(doHtml) savedList.push('HTML');
+    if(doJson) savedList.push('JSON');
+    toast(`Скачано в «Загрузки»: ${savedList.join(' + ')}`);
   }
 
   pushHistory(snap);
@@ -1290,19 +1335,26 @@ function renderHistory(){
   const box = el('history');
   el('histCount').textContent = h.length;
   if(!h.length){ box.innerHTML = '<div class="empty">Пока пусто</div>'; return; }
+  
   box.innerHTML = h.map((s,i)=>{
+    const histPrice = s.result && s.result.contractPrice !== undefined 
+      ? s.result.contractPrice 
+      : (s.result && s.result.priceClient !== undefined ? s.result.priceClient : 0);
+
     const bTag = (s.result && s.result.managerBenefit > 0) ? ` · 💰 бенефит ${fmt(s.result.managerBenefit)} ₽` : '';
     const alarmTag = (s.result && s.result.typographyRevenue < s.result.minPrice) ? ' · ⚠️ АЛАРМ' : '';
+    
     return `<div class="hist-item">
       <div class="hist-main">
         <b>${escHtml(s.client || 'Без клиента')}</b>
         <small>${escHtml(s.savedAtLocal)} · ${escHtml(s.employee||'')} · ${escHtml(s.summary||'')}${bTag}${alarmTag}</small>
       </div>
-      <div class="hist-price">${fmt(s.result.contractPrice)} ₽</div>
+      <div class="hist-price">${fmt(histPrice)} ₽</div>
       <button class="icon-btn" data-load="${i}" title="Загрузить расчёт">↩</button>
       <button class="icon-btn" data-del="${i}" title="Удалить">✕</button>
     </div>`;
   }).join('');
+  
   box.querySelectorAll('[data-load]').forEach(b=>{
     b.addEventListener('click', ()=>{
       const snap = getHistory()[+b.dataset.load];
@@ -1340,9 +1392,12 @@ FIELD_IDS.concat(CHK_IDS).forEach(id=>{
   e.addEventListener('change', render);
 });
 ['clientName','note'].forEach(id=>{ el(id).addEventListener('input', render); });
-el('saveJson').addEventListener('change', savePrefs);
-el('saveJson').addEventListener('change', ()=>{
-  el('saveJson').closest('.chk').classList.toggle('on', el('saveJson').checked);
+
+['saveHtml', 'saveJson', 'saveCsv'].forEach(id => {
+  el(id).addEventListener('change', savePrefs);
+  el(id).addEventListener('change', () => {
+    el(id).closest('.chk').classList.toggle('on', el(id).checked);
+  });
 });
 
 document.querySelectorAll('.chk input').forEach(i=>{
@@ -1358,8 +1413,13 @@ document.querySelectorAll('.chk input').forEach(i=>{
   updateFolderUI();
 
   const prefs = loadPrefs();
-  if(prefs.saveJson === false) el('saveJson').checked = false;
-  el('saveJson').closest('.chk').classList.toggle('on', el('saveJson').checked);
+  if(prefs.saveHtml !== undefined) el('saveHtml').checked = prefs.saveHtml;
+  if(prefs.saveJson !== undefined) el('saveJson').checked = prefs.saveJson;
+  if(prefs.saveCsv !== undefined) el('saveCsv').checked = prefs.saveCsv;
+  
+  document.querySelectorAll('.chk input').forEach(i=>{
+    i.closest('.chk').classList.toggle('on', i.checked);
+  });
 
   if(FSA_SUPPORTED){
     try{
