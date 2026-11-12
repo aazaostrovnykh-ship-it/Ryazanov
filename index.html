@@ -47,6 +47,7 @@ label.fld{display:block;font-size:12px;font-weight:600;color:var(--berry);margin
 select,input[type=number],input[type=text],textarea{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;color:var(--ink);background:#fff;outline:none;font-family:inherit;transition:.15s}
 textarea{resize:vertical;min-height:56px}
 select:focus,input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(110,166,216,.15)}
+input:disabled{background:#f5f5f5;cursor:not-allowed}
 
 .subblock{margin-top:14px;padding:14px;background:var(--berry-light);border-radius:11px;border:1px dashed rgba(139,28,66,.35)}
 .subblock h4{margin:0 0 10px;font-size:13px;color:var(--berry);font-weight:600}
@@ -58,11 +59,18 @@ select:focus,input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
 .chk input{accent-color:var(--berry);width:15px;height:15px;cursor:pointer;margin:0}
 .chk.on{background:#fff;border-color:var(--blue);box-shadow:0 2px 6px rgba(110,166,216,.18)}
 
+/* ---------- Бенефит ---------- */
+.benefit-block{margin-top:14px;padding:14px;background:#eff6fd;border:1px solid #cfe3f7;border-radius:12px}
+.benefit-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:600;color:#2b6da8;font-size:14px;margin:0;user-select:none}
+.benefit-toggle input{width:18px;height:18px;accent-color:#2b6da8;cursor:pointer;margin:0;flex-shrink:0}
+.benefit-toggle span{line-height:1.4}
+
 /* ---------- KPI ---------- */
 .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:640px){.kpi-grid{grid-template-columns:1fr}}
 .kpi{background:var(--berry-light);border-radius:12px;padding:12px 14px;border:1px solid rgba(139,28,66,.06)}
 .kpi-l{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.kpi-l small{display:block;font-weight:400;text-transform:none;letter-spacing:0;font-size:10.5px;margin-top:2px;color:var(--muted)}
 .kpi-v{display:block;font-size:24px;font-weight:500;color:var(--berry);letter-spacing:-.5px;margin-top:3px}
 .kpi-s{display:block;font-size:12px;color:var(--muted);margin-top:2px}
 .kpi.blue{background:#eff6fd;border-color:#cfe3f7}
@@ -71,12 +79,16 @@ select:focus,input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
 .kpi.green .kpi-v{color:var(--ok)}
 .kpi.red{background:#fdeeee;border-color:#f5c6c6}
 .kpi.red .kpi-v{color:var(--danger)}
+.kpi.benefit{background:#eff6fd;border-color:#b8d4ee}
+.kpi.benefit .kpi-v{color:#2b6da8}
 
 .tradeoff{margin-top:12px;padding:14px;border-radius:12px;background:linear-gradient(135deg,#fff8e6,#fffdf7);
   border:1px solid #ffe0a3;color:#7a5a00;font-size:14px;line-height:1.55}
 .tradeoff b{font-size:17px;color:#5c4300}
 .tradeoff.warn{background:#fdeeee;border-color:#f5c6c6;color:#8a1c1c}
 .tradeoff.warn b{color:var(--danger)}
+.tradeoff.benefit{background:linear-gradient(135deg,#eff6fd,#f7fbff);border-color:#b8d4ee;color:#2b6da8}
+.tradeoff.benefit b{color:#1a4f7d}
 
 /* ---------- Таблица ---------- */
 .bd-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13.5px;border-bottom:1px dashed #f0e3e8}
@@ -135,7 +147,7 @@ details[open] summary::before{transform:rotate(90deg)}
 /* ---------- Печать ---------- */
 @media print{
   body{background:#fff}
-  .topbar,.col-left,.actions,.hist-card,.hint,details,.kpi-grid .kpi.blue,.retail-info{display:none!important}
+  .topbar,.col-left,.actions,.hist-card,.hint,details,.kpi-grid .kpi.blue,.retail-info,.benefit-block{display:none!important}
   .layout{display:block;padding:0;max-width:none}
   .card{box-shadow:none;border:1px solid #000;page-break-inside:avoid;margin:0 0 10px}
   .print-only{display:block!important}
@@ -148,7 +160,7 @@ details[open] summary::before{transform:rotate(90deg)}
 
 <div class="topbar">
   <div class="brand">Типография · внутренний калькулятор офсета
-    <small>Себестоимость и прайс клиента · сохранение смет</small>
+    <small>Себестоимость, бенефит менеджера и сохранение смет</small>
   </div>
   <div class="topbar-right">
     <label>Сотрудник
@@ -384,8 +396,8 @@ details[open] summary::before{transform:rotate(90deg)}
         </div>
         <div class="hint" style="margin-top:10px">
           Для каждой бумаги два поля: <b>себестоимость пачки</b> (по ней идёт расчёт)
-          и <b>клиентская цена пачки</b> (справочно — для сравнения с прайсом).
-          Под ними строка «себест. ₽/л · клиент ₽/л · наценка %» — так видно, где живёт запас.
+          и <b>клиентская цена пачки</b> (справочно). Под ними строка
+          «себест. ₽/л · клиент ₽/л · наценка %».
         </div>
       </details>
     </div>
@@ -404,8 +416,10 @@ details[open] summary::before{transform:rotate(90deg)}
       <div class="kpi-grid">
         <div class="kpi"><span class="kpi-l">Себестоимость</span><span class="kpi-v" id="kCost">—</span><span class="kpi-s" id="kCostUnit">—</span></div>
         <div class="kpi blue"><span class="kpi-l">Прайс (наценка <span id="lblMarkup">30</span>%)</span><span class="kpi-v" id="kList">—</span><span class="kpi-s" id="kListUnit">—</span></div>
-        <div class="kpi green"><span class="kpi-l">Цена клиенту (скидка <span id="lblDisc">0</span>%)</span><span class="kpi-v" id="kClient">—</span><span class="kpi-s" id="kClientUnit">—</span></div>
         <div class="kpi red"><span class="kpi-l">Минимальная цена</span><span class="kpi-v" id="kMin">—</span><span class="kpi-s" id="kMinUnit">—</span></div>
+        <div class="kpi benefit"><span class="kpi-l">Бенефит менеджера</span><span class="kpi-v" id="kBenefit">—</span><span class="kpi-s" id="kBenefitPct">—</span></div>
+        <div class="kpi green"><span class="kpi-l">Цена клиенту <small id="lblClientMode">(скидка 0%)</small></span><span class="kpi-v" id="kClient">—</span><span class="kpi-s" id="kClientUnit">—</span></div>
+        <div class="kpi"><span class="kpi-l">Прибыль / маржа</span><span class="kpi-v" id="kProfit">—</span><span class="kpi-s" id="kMargin">—</span></div>
       </div>
 
       <div class="tradeoff" id="tradeoff">—</div>
@@ -422,6 +436,24 @@ details[open] summary::before{transform:rotate(90deg)}
         <div>
           <label class="fld">Мин. маржа (порог), %</label>
           <input type="number" id="minMargin" value="10" step="1" min="0" max="200">
+        </div>
+      </div>
+
+      <!-- БЕНЕФИТ МЕНЕДЖЕРА -->
+      <div class="benefit-block">
+        <label class="benefit-toggle">
+          <input type="checkbox" id="useBenefit">
+          <span>💰 Менеджерский бенефит — цена клиенту = себестоимость + бенефит</span>
+        </label>
+        <div class="grid" id="benefitFields" style="display:none;margin-top:10px">
+          <div>
+            <label class="fld">Бенефит, ₽</label>
+            <input type="number" id="benefit" value="0" step="100" min="0">
+          </div>
+          <div>
+            <label class="fld">Бенефит, % от себестоимости</label>
+            <input type="text" id="benefitPct" readonly style="background:#f5f9fc;color:#2b6da8;font-weight:600;cursor:default">
+          </div>
         </div>
       </div>
 
@@ -445,9 +477,10 @@ details[open] summary::before{transform:rotate(90deg)}
       </div>
 
       <div class="hint">
-        <b>Как считаем:</b> «Себестоимость» — прямые затраты по себестоимостным тарифам (бумага-себест. + формы + печать + переплёт + послепечать).
-        Наценка задаётся вами. «Минимальная цена» = себестоимость × (1 + мин. маржа) — ниже опускаться нельзя.
-        Голубая строка выше показывает, сколько стоила бы только бумага по клиентскому прайсу.
+        <b>Как считаем:</b> «Себестоимость» — прямые затраты по себестоимостным тарифам.
+        <b>Обычный режим:</b> цена = себестоимость × (1 + наценка) × (1 − скидка).
+        <b>Режим бенефита:</b> цена = себестоимость + бенефит (поле скидки гаснет).
+        «Минимальная цена» = себестоимость × (1 + мин. маржа) — ниже опускаться нельзя в любом режиме.
       </div>
     </div>
 
@@ -479,7 +512,6 @@ function toast(msg, isErr){
   t._h = setTimeout(()=>t.classList.remove('show'), 2600);
 }
 
-/* ---------- IndexedDB для хранения ручки папки ---------- */
 function idbOpen(){
   return new Promise((res,rej)=>{
     const r = indexedDB.open('offset_calc_db', 1);
@@ -509,11 +541,6 @@ async function kvGet(k){
 
 /* ============================================================
    1. ТАРИФЫ
-   ------------------------------------------------------------
-   ВХИ 80:        1000 л = 1890 ₽ себест. / 3250 ₽ клиент
-   Меловка 120:    500 л = 1600 ₽ себест. / 3000 ₽ клиент
-   Меловка 250:    300 л = 1700 ₽ себест. / 3300 ₽ клиент
-   Меловка 300:    250 л = 1600 ₽ себест. / 3000 ₽ клиент
    ============================================================ */
 const DEFAULT_CFG = {
   platePrice: 500,
@@ -558,15 +585,11 @@ function loadCfg(){
   }catch(e){}
   return base;
 }
-function saveCfg(){
-  localStorage.setItem(CFG_KEY, JSON.stringify(CFG));
-}
+function saveCfg(){ localStorage.setItem(CFG_KEY, JSON.stringify(CFG)); }
 
 let CFG = loadCfg();
 
-function getByPath(obj, path){
-  return path.split('.').reduce((o,k)=> (o==null ? o : o[k]), obj);
-}
+function getByPath(obj, path){ return path.split('.').reduce((o,k)=> (o==null ? o : o[k]), obj); }
 function setByPath(obj, path, val){
   const parts = path.split('.');
   let o = obj;
@@ -574,7 +597,6 @@ function setByPath(obj, path, val){
   o[parts[parts.length-1]] = val;
 }
 
-/* Подсказка под каждой бумагой: себест./клиент ₽ за лист + наценка */
 function updatePaperRates(){
   document.querySelectorAll('[data-rate]').forEach(d=>{
     const k = d.dataset.rate;
@@ -615,11 +637,10 @@ function compute(){
   const push = (section,label,value,detail='') => rows.push({section,label,value,detail});
 
   let summary = '';
-  let retailPaper = 0; // справочно: если бы бумагу отдавали по клиентскому прайсу
+  let retailPaper = 0;
 
   if(product === 'book' || product === 'brochure'){
     const isBook = product === 'book';
-
     const format   = el(isBook?'book-format':'brochure-format').value;
     const pages    = Math.max(4, Math.round(num(el(isBook?'book-pages':'brochure-pages').value,4)/4)*4);
     const pBlock   = el(isBook?'book-paper':'brochure-paper').value;
@@ -631,7 +652,6 @@ function compute(){
 
     summary = `${isBook?'Книга':'Брошюра'} · ${format} · ${pages} стр. · ${qty} экз.`;
 
-    /* ---- Блок ---- */
     const pagesPerSheet   = CFG.pagesPerA2[format];
     const sheetsPerCopy   = Math.ceil(pages / pagesPerSheet);
     const cleanBlockSheets= sheetsPerCopy * qty;
@@ -652,7 +672,6 @@ function compute(){
     push('Блок','Бумага блока', fmt(paperCostBlock)+' ₽', `${packsBlock} пач. × ${fmt(pb.packCost)} ₽ (${pb.name}, себест.)`);
     push('Блок','Формы блока', fmt(platesCostBlock)+' ₽', `${platesBlock} шт × ${CFG.platePrice} ₽`);
 
-    /* ---- Обложка ---- */
     const coversPerSheet   = CFG.coversPerA2[format];
     const cleanCoverSheets = Math.ceil(qty / coversPerSheet);
     const platesCover      = platesPerSheet(cCover, isSelfTurn);
@@ -673,7 +692,6 @@ function compute(){
     push('Обложка','Бумага обложки', fmt(paperCostCover)+' ₽', `${packsCover} пач. × ${fmt(pc.packCost)} ₽ (${pc.name}, себест.)`);
     push('Обложка','Формы обложки', fmt(platesCostCover)+' ₽', `${platesCover} шт × ${CFG.platePrice} ₽`);
 
-    /* ---- Послепечать ---- */
     const bindPrice = CFG.binding[binding];
     const bindCost  = qty * bindPrice;
     const cutCost   = isCut ? (cleanBlockSheets + cleanCoverSheets) * CFG.cut : 0;
@@ -691,7 +709,6 @@ function compute(){
     cost.postpress += lamCostCover + cutCost + creaseCost;
 
   } else {
-    /* ---- ЛИСТОВКИ ---- */
     const format = el('leaflet-format').value;
     const paper  = el('leaflet-paper').value;
     const color  = el('leaflet-color').value;
@@ -745,10 +762,26 @@ function render(){
   const markup     = Math.max(0, num(el('markup').value, 30));
   const discount   = Math.min(95, Math.max(0, num(el('discount').value, 0)));
   const minMargin  = Math.max(0, num(el('minMargin').value, 10));
+  const useBenefit = el('useBenefit').checked;
+  const benefit    = Math.max(0, num(el('benefit').value, 0));
 
-  const priceList  = cost * (1 + markup/100);
-  const priceClient= priceList * (1 - discount/100);
-  const minPrice   = cost * (1 + minMargin/100);
+  const priceList = cost * (1 + markup/100);
+  const minPrice  = cost * (1 + minMargin/100);
+
+  let priceClient;
+  if(useBenefit){
+    priceClient = cost + benefit;
+  }else{
+    priceClient = priceList * (1 - discount/100);
+  }
+
+  const benefitPct = cost > 0 ? (benefit / cost * 100) : 0;
+
+  // Показать/скрыть поля бенефита
+  el('benefitFields').style.display = useBenefit ? 'grid' : 'none';
+  el('discount').disabled = useBenefit;
+  el('discount').style.opacity = useBenefit ? '0.4' : '1';
+  el('benefitPct').value = useBenefit ? fmt2(benefitPct) + ' %' : '—';
 
   const maxDiscRub = Math.max(0, priceList - minPrice);
   const maxDiscPct = priceList > 0 ? (1 - minPrice/priceList) * 100 : 0;
@@ -768,23 +801,52 @@ function render(){
   el('kClientUnit').textContent = fmt2(priceClient / r.qty) + ' ₽ / шт';
   el('kMin').textContent      = fmt(minPrice) + ' ₽';
   el('kMinUnit').textContent  = fmt2(minPrice / r.qty) + ' ₽ / шт';
+  el('kProfit').textContent   = fmt(profit) + ' ₽';
+  el('kMargin').textContent   = fmt2(margin) + '% маржа';
+
+  if(useBenefit){
+    el('kBenefit').textContent    = fmt(benefit) + ' ₽';
+    el('kBenefitPct').textContent = fmt2(benefitPct) + '% от себест.';
+    el('lblClientMode').textContent = '(себест. + бенефит)';
+  }else{
+    el('kBenefit').textContent    = '—';
+    el('kBenefitPct').textContent = 'не задан';
+    el('lblClientMode').textContent = '(скидка ' + fmt2(discount) + '%)';
+  }
 
   el('lblMarkup').textContent = fmt2(markup);
-  el('lblDisc').textContent   = fmt2(discount);
   el('calcBadge').textContent = r.summary;
 
-  /* --- Запас на торг --- */
+  /* --- Плашка запаса / бенефита --- */
   const tr = el('tradeoff');
-  if(belowFloor){
-    tr.className = 'tradeoff warn';
-    tr.innerHTML = `⚠️ <b>Цена ниже минимальной!</b> Теряем ${fmt(minPrice - priceClient)} ₽ от порога.
-      Маржа сейчас ${fmt2(margin)}%, а порог ${fmt2(minMargin)}%. Поднимите цену или снизьте скидку.`;
-  } else {
-    tr.className = 'tradeoff';
-    tr.innerHTML = `Запас на торг: <b>${fmt(tradeRoom)} ₽</b> (${fmt2(tradeRoomPct)}% от текущей цены)
-      · Максимальная скидка от прайса: <b>${fmt2(maxDiscPct)}%</b> (${fmt(maxDiscRub)} ₽)
-      <br>Прибыль: <b>${fmt(profit)} ₽</b> · Маржа: <b>${fmt2(margin)}%</b>
-      · Ниже <b>${fmt(minPrice)} ₽</b> опускаться нельзя`;
+  if(useBenefit){
+    if(benefit <= 0){
+      tr.className = 'tradeoff warn';
+      tr.innerHTML = `⚠️ <b>Бенефит не задан.</b> Введите сумму бенефита — иначе цена клиенту равна себестоимости (маржа 0%).`;
+    }else if(belowFloor){
+      tr.className = 'tradeoff warn';
+      tr.innerHTML = `⚠️ <b>Бенефит ${fmt(benefit)} ₽ ниже минимального порога!</b>
+        Нужно минимум ${fmt(minPrice - cost)} ₽, чтобы попасть в мин. маржу ${fmt2(minMargin)}%.
+        Сейчас цена ${fmt(priceClient)} ₽ ниже порога ${fmt(minPrice)} ₽ на ${fmt(minPrice - priceClient)} ₽.`;
+    }else{
+      tr.className = 'tradeoff benefit';
+      tr.innerHTML = `💰 <b>Бенефит менеджера: ${fmt(benefit)} ₽</b> (${fmt2(benefitPct)}% от себестоимости)
+        <br>Цена клиенту: ${fmt(cost)} ₽ (себест.) + ${fmt(benefit)} ₽ (бенефит) = <b>${fmt(priceClient)} ₽</b>
+        <br>Прибыль: <b>${fmt(profit)} ₽</b> · Маржа: <b>${fmt2(margin)}%</b>
+        · Порог: <b>${fmt(minPrice)} ₽</b>`;
+    }
+  }else{
+    if(belowFloor){
+      tr.className = 'tradeoff warn';
+      tr.innerHTML = `⚠️ <b>Цена ниже минимальной!</b> Теряем ${fmt(minPrice - priceClient)} ₽ от порога.
+        Маржа сейчас ${fmt2(margin)}%, а порог ${fmt2(minMargin)}%. Поднимите цену или снизьте скидку.`;
+    }else{
+      tr.className = 'tradeoff';
+      tr.innerHTML = `Запас на торг: <b>${fmt(tradeRoom)} ₽</b> (${fmt2(tradeRoomPct)}% от текущей цены)
+        · Максимальная скидка от прайса: <b>${fmt2(maxDiscPct)}%</b> (${fmt(maxDiscRub)} ₽)
+        <br>Прибыль: <b>${fmt(profit)} ₽</b> · Маржа: <b>${fmt2(margin)}%</b>
+        · Ниже <b>${fmt(minPrice)} ₽</b> опускаться нельзя`;
+    }
   }
 
   /* --- Структура себестоимости --- */
@@ -837,22 +899,19 @@ function render(){
 }
 
 /* ============================================================
-   4. UI ПЕРЕКЛЮЧЕНИЕ
+   4. UI
    ============================================================ */
 function updateUI(){
   const product = el('product').value;
   el('leaflet-options').style.display  = product === 'leaflet'  ? 'block' : 'none';
   el('brochure-options').style.display = product === 'brochure' ? 'block' : 'none';
   el('book-options').style.display     = product === 'book'     ? 'block' : 'none';
-
-  const selfTurn = el('selfTurn');
-  selfTurn.checked = (product === 'book' || product === 'brochure');
-
+  el('selfTurn').checked = (product === 'book' || product === 'brochure');
   render();
 }
 
 /* ============================================================
-   5. НАСТРОЙКИ ЦЕН — РЕНДЕР
+   5. НАСТРОЙКИ ЦЕН
    ============================================================ */
 function cfgInput(label, path, val, step){
   return `<div>
@@ -900,7 +959,6 @@ function renderSettings(){
   updatePaperRates();
 }
 
-/* Делегированный обработчик: меняем CFG и пересчитываем */
 el('settingsBody').addEventListener('input', e=>{
   const t = e.target.closest('[data-cfg]');
   if(!t) return;
@@ -957,7 +1015,7 @@ el('renameEmp').addEventListener('click', () => {
 });
 
 /* ============================================================
-   7. РАБОТА С ПАПКОЙ
+   7. ПАПКА
    ============================================================ */
 let dirHandle = null;
 const FSA_SUPPORTED = 'showDirectoryPicker' in window;
@@ -1021,8 +1079,8 @@ async function writeFileToDir(name, content, type){
 }
 
 async function appendCsv(line){
-  const CSV_NAME = 'Журнал расчётов.csv';
-  const HEADER = 'Дата;Сотрудник;Клиент;Тип;Тираж;Себестоимость;Наценка %;Прайс;Скидка %;Цена клиенту;Мин. цена;Маржа %;Прибыль;Комментарий';
+  const CSV_NAME = 'Журнал расчётов v3.csv';
+  const HEADER = 'Дата;Сотрудник;Клиент;Тип;Тираж;Себестоимость;Наценка %;Прайс;Скидка %;Цена клиенту;Мин. цена;Маржа %;Прибыль;Бенефит;Комментарий';
   let text = '';
   try{
     const fh = await dirHandle.getFileHandle(CSV_NAME);
@@ -1044,7 +1102,7 @@ function downloadFile(name, content, type){
 }
 
 /* ============================================================
-   8. СОХРАНЕНИЕ РАСЧЁТА
+   8. СОХРАНЕНИЕ
    ============================================================ */
 const FIELD_IDS = [
   'product','qty',
@@ -1053,9 +1111,10 @@ const FIELD_IDS = [
   'brochure-cover-paper','brochure-cover-color','brochure-binding',
   'book-format','book-pages','book-paper','book-color',
   'book-cover-paper','book-cover-color','book-cover-lam','book-binding',
-  'markup','discount','minMargin','clientName','note'
+  'markup','discount','minMargin','clientName','note',
+  'benefit'
 ];
-const CHK_IDS = ['selfTurn','cut','crease'];
+const CHK_IDS = ['selfTurn','cut','crease','useBenefit'];
 
 function gatherInputs(){
   const o = {};
@@ -1077,15 +1136,17 @@ function buildSnapshot(){
   const markup = Math.max(0, num(el('markup').value, 30));
   const discount = Math.min(95, Math.max(0, num(el('discount').value, 0)));
   const minMargin = Math.max(0, num(el('minMargin').value, 10));
+  const useBenefit = el('useBenefit').checked;
+  const benefit = Math.max(0, num(el('benefit').value, 0));
 
   const priceList   = cost * (1 + markup/100);
-  const priceClient = priceList * (1 - discount/100);
+  const priceClient = useBenefit ? (cost + benefit) : (priceList * (1 - discount/100));
   const minPrice    = cost * (1 + minMargin/100);
   const profit      = priceClient - cost;
 
   const now = new Date();
   return {
-    version: 3,
+    version: 4,
     savedAt: now.toISOString(),
     savedAtLocal: now.toLocaleString('ru-RU'),
     employee: el('employee').value,
@@ -1107,7 +1168,10 @@ function buildSnapshot(){
       tradeRoom: Math.round(priceClient - minPrice),
       profit: Math.round(profit),
       marginPct: priceClient>0 ? +((priceClient-cost)/priceClient*100).toFixed(2) : 0,
-      retailPaper: Math.round(r.retailPaper)
+      retailPaper: Math.round(r.retailPaper),
+      useBenefit: useBenefit,
+      benefit: useBenefit ? Math.round(benefit) : 0,
+      benefitPct: (useBenefit && cost > 0) ? +(benefit / cost * 100).toFixed(2) : 0
     },
     costBreakdown: {
       paper: Math.round(r.cost.paper),
@@ -1130,7 +1194,7 @@ function csvLine(snap){
   return [
     snap.savedAtLocal, snap.employee, snap.client || '—', snap.summary, snap.qty,
     r.cost, r.markup, r.priceList, r.discount, r.priceClient, r.minPrice,
-    r.marginPct, r.profit, snap.note
+    r.marginPct, r.profit, r.benefit || 0, snap.note
   ].map(csvEscape).join(';');
 }
 
@@ -1178,6 +1242,9 @@ el('printBtn').addEventListener('click', () => window.print());
 el('copyBtn').addEventListener('click', () => {
   const s = buildSnapshot();
   const r = s.result;
+  const benefitLine = r.useBenefit
+    ? `Бенефит менеджера:  ${fmt(r.benefit)} ₽ (${fmt2(r.benefitPct)}% от себестоимости)\n`
+    : '';
   const txt =
 `СМЕТА ОФСЕТНОЙ ПЕЧАТИ (внутренняя)
 ${s.summary}
@@ -1188,7 +1255,7 @@ ${s.summary}
 Себестоимость:      ${fmt(r.cost)} ₽ (${fmt2(r.costPerUnit)} ₽/шт)
 Наценка:            ${fmt2(r.markup)} %  →  прайс ${fmt(r.priceList)} ₽
 Скидка клиенту:     ${fmt2(r.discount)} %  →  цена ${fmt(r.priceClient)} ₽
-Минимальная цена:   ${fmt(r.minPrice)} ₽ (маржа ${fmt2(r.minMargin)}%)
+${benefitLine}Минимальная цена:   ${fmt(r.minPrice)} ₽ (маржа ${fmt2(r.minMargin)}%)
 Запас на торг:      ${fmt(r.tradeRoom)} ₽
 Макс. скидка от прайса: ${fmt2(r.maxDiscountFromListPct)} %
 Прибыль:            ${fmt(r.profit)} ₽  ·  маржа ${fmt2(r.marginPct)}%
@@ -1220,17 +1287,20 @@ function renderHistory(){
   el('histCount').textContent = h.length;
   if(!h.length){ box.innerHTML = '<div class="empty">Пока пусто</div>'; return; }
 
-  box.innerHTML = h.map((s,i)=>`
-    <div class="hist-item">
+  box.innerHTML = h.map((s,i)=>{
+    const bTag = (s.result && s.result.useBenefit)
+      ? ` · 💰 бенефит ${fmt(s.result.benefit)} ₽`
+      : '';
+    return `<div class="hist-item">
       <div class="hist-main">
         <b>${(s.client || 'Без клиента').replace(/</g,'&lt;')}</b>
-        <small>${s.savedAtLocal} · ${(s.employee||'').replace(/</g,'&lt;')} · ${(s.summary||'').replace(/</g,'&lt;')}</small>
+        <small>${s.savedAtLocal} · ${(s.employee||'').replace(/</g,'&lt;')} · ${(s.summary||'').replace(/</g,'&lt;')}${bTag}</small>
       </div>
       <div class="hist-price">${fmt(s.result.priceClient)} ₽</div>
       <button class="icon-btn" data-load="${i}" title="Загрузить расчёт">↩</button>
       <button class="icon-btn" data-del="${i}" title="Удалить">✕</button>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 
   box.querySelectorAll('[data-load]').forEach(b=>{
     b.addEventListener('click', ()=>{
@@ -1267,9 +1337,10 @@ FIELD_IDS.concat(CHK_IDS).forEach(id=>{
   e.addEventListener('input', render);
   e.addEventListener('change', render);
 });
-['markup','discount','minMargin'].forEach(id=>{
-  el(id).addEventListener('input', render);
-  el(id).addEventListener('change', render);
+['markup','discount','minMargin','benefit','useBenefit'].forEach(id=>{
+  const e = el(id); if(!e) return;
+  e.addEventListener('input', render);
+  e.addEventListener('change', render);
 });
 ['clientName','note'].forEach(id=>{
   el(id).addEventListener('input', render);
