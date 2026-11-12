@@ -88,6 +88,9 @@ select:focus,input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
 .bd-pct{flex:0 0 52px;text-align:right;color:var(--muted);font-size:12px}
 .bd-total{display:flex;justify-content:space-between;padding-top:10px;margin-top:8px;border-top:2px solid var(--blue);font-weight:600;font-size:15px;color:var(--berry)}
 
+.retail-info{margin-top:10px;padding:10px 12px;background:#eff6fd;border:1px solid #cfe3f7;border-radius:9px;font-size:12.5px;color:#2b6da8;line-height:1.5}
+.retail-info b{color:#1a4f7d}
+
 details{margin-top:12px}
 details summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--berry);padding:8px 0;user-select:none;list-style:none}
 details summary::-webkit-details-marker{display:none}
@@ -102,8 +105,12 @@ details[open] summary::before{transform:rotate(90deg)}
 .unit-price{font-size:11px;color:#aaa;font-weight:400;margin-left:5px}
 
 /* ---------- Настройки цен ---------- */
-.paper-name{grid-column:1/-1;font-size:12px;font-weight:600;color:var(--berry);margin-top:8px}
-.paper-rate{grid-column:1/-1;font-size:11.5px;color:var(--muted);margin:-4px 0 6px}
+.paper-name{font-size:12px;font-weight:600;color:var(--berry);margin:12px 0 6px}
+.paper-rate{font-size:11.5px;color:var(--muted);margin:2px 0 4px;padding:6px 8px;background:#f9f4f6;border-radius:6px;line-height:1.55}
+.paper-rate.base{background:#eaf7ee;color:var(--ok)}
+.paper-rate.up{background:#fff8e6;color:var(--warn)}
+.paper-rate.low{background:#fdeeee;color:var(--danger)}
+.paper-rate b{font-weight:700}
 .settings-foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 
 /* ---------- История ---------- */
@@ -128,7 +135,7 @@ details[open] summary::before{transform:rotate(90deg)}
 /* ---------- Печать ---------- */
 @media print{
   body{background:#fff}
-  .topbar,.col-left,.actions,.hist-card,.hint,details,.kpi-grid .kpi.blue{display:none!important}
+  .topbar,.col-left,.actions,.hist-card,.hint,details,.kpi-grid .kpi.blue,.retail-info{display:none!important}
   .layout{display:block;padding:0;max-width:none}
   .card{box-shadow:none;border:1px solid #000;page-break-inside:avoid;margin:0 0 10px}
   .print-only{display:block!important}
@@ -141,7 +148,7 @@ details[open] summary::before{transform:rotate(90deg)}
 
 <div class="topbar">
   <div class="brand">Типография · внутренний калькулятор офсета
-    <small>Расчёт, скидки и сохранение смет для сотрудников</small>
+    <small>Себестоимость и прайс клиента · сохранение смет</small>
   </div>
   <div class="topbar-right">
     <label>Сотрудник
@@ -376,7 +383,9 @@ details[open] summary::before{transform:rotate(90deg)}
           <button class="btn" id="resetCfg">↺ Сбросить к значениям по умолчанию</button>
         </div>
         <div class="hint" style="margin-top:10px">
-          Меняйте цифры — расчёт пересчитается сразу. Сохраняется в этом браузере, на других компьютерах свои настройки.
+          Для каждой бумаги два поля: <b>себестоимость пачки</b> (по ней идёт расчёт)
+          и <b>клиентская цена пачки</b> (справочно — для сравнения с прайсом).
+          Под ними строка «себест. ₽/л · клиент ₽/л · наценка %» — так видно, где живёт запас.
         </div>
       </details>
     </div>
@@ -422,6 +431,8 @@ details[open] summary::before{transform:rotate(90deg)}
         <div class="bd-total"><span>Итого себестоимость</span><span id="bdTotal">—</span></div>
       </div>
 
+      <div class="retail-info" id="retailInfo" style="display:none"></div>
+
       <details id="detailBlock">
         <summary>Полная детализация расчёта</summary>
         <div id="rows"></div>
@@ -434,8 +445,9 @@ details[open] summary::before{transform:rotate(90deg)}
       </div>
 
       <div class="hint">
-        <b>Как считаем:</b> «Себестоимость» — прямые затраты по формуле типографии (бумага + формы + печать + переплёт + послепечать).
-        Тарифы задаются в блоке «Настройки цен» слева. «Минимальная цена» = себестоимость × (1 + мин. маржа) — ниже опускаться нельзя.
+        <b>Как считаем:</b> «Себестоимость» — прямые затраты по себестоимостным тарифам (бумага-себест. + формы + печать + переплёт + послепечать).
+        Наценка задаётся вами. «Минимальная цена» = себестоимость × (1 + мин. маржа) — ниже опускаться нельзя.
+        Голубая строка выше показывает, сколько стоила бы только бумага по клиентскому прайсу.
       </div>
     </div>
 
@@ -496,18 +508,22 @@ async function kvGet(k){
 }
 
 /* ============================================================
-   1. ТАРИФЫ (по умолчанию) + настройки
+   1. ТАРИФЫ
+   ------------------------------------------------------------
+   ВХИ 80:        1000 л = 1890 ₽ себест. / 3250 ₽ клиент
+   Меловка 120:    500 л = 1600 ₽ себест. / 3000 ₽ клиент
+   Меловка 250:    300 л = 1700 ₽ себест. / 3300 ₽ клиент
+   Меловка 300:    250 л = 1600 ₽ себест. / 3000 ₽ клиент
    ============================================================ */
 const DEFAULT_CFG = {
   platePrice: 500,
   wastePerForm: 50,
   printPrices: {'1+0':2, '1+1':4, '4+0':8, '4+4':16},
   paper: {
-    // ВХИ 80 — 1000 листов А2 = 1836 ₽  → 1,836 ₽/лист
-    '80':  { name:'ВХИ 80 г/м²',          packSize:1000, packPrice:1836 },
-    '120': { name:'Мелованная 120 г/м²',  packSize:500,  packPrice:3000 },
-    '250': { name:'Мелованная 250 г/м²',  packSize:300,  packPrice:3300 },
-    '300': { name:'Мелованная 300 г/м²',  packSize:250,  packPrice:3000 }
+    '80':  { name:'ВХИ 80 г/м²',          packSize:1000, packCost:1890, packPrice:3250 },
+    '120': { name:'Мелованная 120 г/м²',  packSize:500,  packCost:1600, packPrice:3000 },
+    '250': { name:'Мелованная 250 г/м²',  packSize:300,  packCost:1700, packPrice:3300 },
+    '300': { name:'Мелованная 300 г/м²',  packSize:250,  packCost:1600, packPrice:3000 }
   },
   cut: 1.0,
   crease: 2.5,
@@ -523,7 +539,7 @@ const BREAKDOWN_LABELS = {
   binding:'Переплет', postpress:'Послепечать'
 };
 
-const CFG_KEY = 'offset_calc_cfg_v1';
+const CFG_KEY = 'offset_calc_cfg_v2';
 
 function deepMerge(a,b){
   for(const k in b){
@@ -558,6 +574,24 @@ function setByPath(obj, path, val){
   o[parts[parts.length-1]] = val;
 }
 
+/* Подсказка под каждой бумагой: себест./клиент ₽ за лист + наценка */
+function updatePaperRates(){
+  document.querySelectorAll('[data-rate]').forEach(d=>{
+    const k = d.dataset.rate;
+    const p = CFG.paper[k];
+    if(!p) return;
+    const costRate   = p.packSize ? p.packCost  / p.packSize : 0;
+    const retailRate = p.packSize ? p.packPrice / p.packSize : 0;
+    const markupPct  = p.packCost > 0 ? (p.packPrice / p.packCost - 1) * 100 : 0;
+    let cls = 'paper-rate';
+    if(markupPct >= 40) cls += ' base';
+    else if(markupPct >= 15) cls += ' up';
+    else cls += ' low';
+    d.className = cls;
+    d.innerHTML = `себест. <b>${fmt2(costRate)} ₽/л</b> · клиент <b>${fmt2(retailRate)} ₽/л</b> · наценка на бумагу <b>${fmt2(markupPct)}%</b>`;
+  });
+}
+
 /* ============================================================
    2. ЯДРО РАСЧЁТА
    ============================================================ */
@@ -581,6 +615,7 @@ function compute(){
   const push = (section,label,value,detail='') => rows.push({section,label,value,detail});
 
   let summary = '';
+  let retailPaper = 0; // справочно: если бы бумагу отдавали по клиентскому прайсу
 
   if(product === 'book' || product === 'brochure'){
     const isBook = product === 'book';
@@ -607,13 +642,14 @@ function compute(){
     const pb          = CFG.paper[pBlock];
     const packsBlock  = Math.ceil(totalBlockSheets / pb.packSize);
     const printCostBlock = cleanBlockSheets * CFG.printPrices[cBlock];
-    const paperCostBlock = packsBlock * pb.packPrice;
+    const paperCostBlock = packsBlock * pb.packCost;
     const platesCostBlock= platesBlock * CFG.platePrice;
+    retailPaper += packsBlock * pb.packPrice;
 
     push('Блок','Листов А2 на блок (чистых)', fmt(cleanBlockSheets)+' шт', `${sheetsPerCopy} л. × ${fmt(qty)} экз.`);
     push('Блок','Бумага на приладку', fmt(wasteBlockSheets)+' шт', `${platesBlock} форм × ${CFG.wastePerForm} л.`);
     push('Блок','Печать блока', fmt(printCostBlock)+' ₽', `${fmt(cleanBlockSheets)} отт. × ${CFG.printPrices[cBlock]} ₽`);
-    push('Блок','Бумага блока', fmt(paperCostBlock)+' ₽', `${packsBlock} пач. × ${fmt(pb.packPrice)} ₽ (${pb.name})`);
+    push('Блок','Бумага блока', fmt(paperCostBlock)+' ₽', `${packsBlock} пач. × ${fmt(pb.packCost)} ₽ (${pb.name}, себест.)`);
     push('Блок','Формы блока', fmt(platesCostBlock)+' ₽', `${platesBlock} шт × ${CFG.platePrice} ₽`);
 
     /* ---- Обложка ---- */
@@ -626,14 +662,15 @@ function compute(){
     const pc             = CFG.paper[pCover];
     const packsCover     = Math.ceil(totalCoverSheets / pc.packSize);
     const printCostCover = cleanCoverSheets * CFG.printPrices[cCover];
-    const paperCostCover = packsCover * pc.packPrice;
+    const paperCostCover = packsCover * pc.packCost;
     const platesCostCover= platesCover * CFG.platePrice;
     const lamCostCover   = lamCover > 0 ? totalCoverSheets * lamCover : 0;
+    retailPaper += packsCover * pc.packPrice;
 
     push('Обложка','Листов А2 на обложку (чистых)', fmt(cleanCoverSheets)+' шт', `по ${coversPerSheet} шт на А2`);
     push('Обложка','Бумага на приладку (обложка)', fmt(wasteCoverSheets)+' шт');
     push('Обложка','Печать обложки', fmt(printCostCover)+' ₽', `${fmt(cleanCoverSheets)} отт. × ${CFG.printPrices[cCover]} ₽`);
-    push('Обложка','Бумага обложки', fmt(paperCostCover)+' ₽', `${packsCover} пач. × ${fmt(pc.packPrice)} ₽ (${pc.name})`);
+    push('Обложка','Бумага обложки', fmt(paperCostCover)+' ₽', `${packsCover} пач. × ${fmt(pc.packCost)} ₽ (${pc.name}, себест.)`);
     push('Обложка','Формы обложки', fmt(platesCostCover)+' ₽', `${platesCover} шт × ${CFG.platePrice} ₽`);
 
     /* ---- Послепечать ---- */
@@ -670,15 +707,16 @@ function compute(){
     const pd          = CFG.paper[paper];
     const packs       = Math.ceil(totalSheets / pd.packSize);
     const printCost   = cleanSheets * CFG.printPrices[color];
-    const paperCost   = packs * pd.packPrice;
+    const paperCost   = packs * pd.packCost;
     const platesCost  = plates * CFG.platePrice;
     const cutCost     = isCut ? cleanSheets * CFG.cut : 0;
     const creaseCost  = isCrease ? totalSheets * CFG.crease : 0;
+    retailPaper += packs * pd.packPrice;
 
     push('Печать','Листов А2 чистых', fmt(cleanSheets)+' шт', `по ${itemsPerA2} шт на А2`);
     push('Печать','Бумага на приладку', fmt(wasteSheets)+' шт', `${plates} форм × ${CFG.wastePerForm} л.`);
     push('Печать','Печать (работа)', fmt(printCost)+' ₽', `${fmt(cleanSheets)} отт. × ${CFG.printPrices[color]} ₽`);
-    push('Печать','Бумага', fmt(paperCost)+' ₽', `${packs} пач. × ${fmt(pd.packPrice)} ₽ (${pd.name})`);
+    push('Печать','Бумага', fmt(paperCost)+' ₽', `${packs} пач. × ${fmt(pd.packCost)} ₽ (${pd.name}, себест.)`);
     push('Печать','Печатные формы', fmt(platesCost)+' ₽', `${plates} шт × ${CFG.platePrice} ₽`);
 
     if(cutCost)    push('Послепечать','Резка', fmt(cutCost)+' ₽', `${fmt(cleanSheets)} л. × ${CFG.cut} ₽`);
@@ -691,7 +729,7 @@ function compute(){
   }
 
   const total = cost.paper + cost.plates + cost.print + cost.binding + cost.postpress;
-  return { rows, cost, total, qty, summary, product };
+  return { rows, cost, total, qty, summary, product, retailPaper };
 }
 
 /* ============================================================
@@ -765,6 +803,19 @@ function render(){
   el('breakdown').innerHTML = bdHtml || '<div class="empty">Нет данных</div>';
   el('bdTotal').textContent = fmt(cost) + ' ₽';
 
+  /* --- Справочно: бумага по клиентскому прайсу --- */
+  const ri = el('retailInfo');
+  if(r.retailPaper > 0){
+    const ourPaper = r.cost.paper;
+    const mPaper = ourPaper > 0 ? (r.retailPaper / ourPaper - 1) * 100 : 0;
+    ri.style.display = 'block';
+    ri.innerHTML = `📄 <b>Бумага по клиентскому прайсу:</b> ${fmt(r.retailPaper)} ₽ ·
+      наша себестоимость бумаги: ${fmt(ourPaper)} ₽ ·
+      наценка на бумагу: <b>${fmt2(mPaper)}%</b>`;
+  }else{
+    ri.style.display = 'none';
+  }
+
   /* --- Полная детализация --- */
   const sections = {};
   r.rows.forEach(row => { (sections[row.section] = sections[row.section] || []).push(row); });
@@ -827,15 +878,17 @@ function renderSettings(){
   });
   h += '</div>';
 
-  h += '<div class="sec-title">Бумага (листов А2 в пачке и цена пачки)</div><div class="grid">';
+  h += '<div class="sec-title">Бумага — себестоимость и клиентский прайс</div>';
   Object.keys(CFG.paper).forEach(k=>{
     const p = CFG.paper[k];
     h += `<div class="paper-name">${p.name}</div>`;
-    h += cfgInput('Листов А2 в пачке', 'paper.' + k + '.packSize', p.packSize, '1');
-    h += cfgInput('Цена пачки, ₽', 'paper.' + k + '.packPrice', p.packPrice, '1');
-    h += `<div class="paper-rate">≈ ${fmt2(p.packPrice / p.packSize)} ₽ / лист А2</div>`;
+    h += `<div class="grid three">
+      ${cfgInput('Листов А2 в пачке', 'paper.' + k + '.packSize', p.packSize, '1')}
+      ${cfgInput('Себестоимость пачки, ₽', 'paper.' + k + '.packCost', p.packCost, '1')}
+      ${cfgInput('Клиентская цена пачки, ₽', 'paper.' + k + '.packPrice', p.packPrice, '1')}
+    </div>`;
+    h += `<div class="paper-rate" data-rate="${k}"></div>`;
   });
-  h += '</div>';
 
   h += '<div class="sec-title">Переплёт, ₽ / экземпляр</div><div class="grid">';
   ['saddle','perfect','soft','hard'].forEach(k=>{
@@ -844,6 +897,7 @@ function renderSettings(){
   h += '</div>';
 
   box.innerHTML = h;
+  updatePaperRates();
 }
 
 /* Делегированный обработчик: меняем CFG и пересчитываем */
@@ -855,6 +909,7 @@ el('settingsBody').addEventListener('input', e=>{
   const v = num(t.value, cur);
   setByPath(CFG, path, v);
   saveCfg();
+  if(path.indexOf('paper.') === 0) updatePaperRates();
   render();
 });
 
@@ -902,7 +957,7 @@ el('renameEmp').addEventListener('click', () => {
 });
 
 /* ============================================================
-   7. РАБОТА С ПАПКОЙ (File System Access API)
+   7. РАБОТА С ПАПКОЙ
    ============================================================ */
 let dirHandle = null;
 const FSA_SUPPORTED = 'showDirectoryPicker' in window;
@@ -1030,7 +1085,7 @@ function buildSnapshot(){
 
   const now = new Date();
   return {
-    version: 2,
+    version: 3,
     savedAt: now.toISOString(),
     savedAtLocal: now.toLocaleString('ru-RU'),
     employee: el('employee').value,
@@ -1051,7 +1106,8 @@ function buildSnapshot(){
       maxDiscountFromListPct: priceList>0 ? +((1 - minPrice/priceList)*100).toFixed(2) : 0,
       tradeRoom: Math.round(priceClient - minPrice),
       profit: Math.round(profit),
-      marginPct: priceClient>0 ? +((priceClient-cost)/priceClient*100).toFixed(2) : 0
+      marginPct: priceClient>0 ? +((priceClient-cost)/priceClient*100).toFixed(2) : 0,
+      retailPaper: Math.round(r.retailPaper)
     },
     costBreakdown: {
       paper: Math.round(r.cost.paper),
@@ -1136,6 +1192,7 @@ ${s.summary}
 Запас на торг:      ${fmt(r.tradeRoom)} ₽
 Макс. скидка от прайса: ${fmt2(r.maxDiscountFromListPct)} %
 Прибыль:            ${fmt(r.profit)} ₽  ·  маржа ${fmt2(r.marginPct)}%
+Справочно, бумага по клиент. прайсу: ${fmt(r.retailPaper)} ₽
 ${s.note ? 'Комментарий: ' + s.note : ''}`;
 
   navigator.clipboard.writeText(txt)
@@ -1144,7 +1201,7 @@ ${s.note ? 'Комментарий: ' + s.note : ''}`;
 });
 
 /* ============================================================
-   10. ИСТОРИЯ (localStorage)
+   10. ИСТОРИЯ
    ============================================================ */
 const HIST_KEY = 'offset_calc_history';
 const HIST_MAX = 200;
@@ -1218,7 +1275,6 @@ FIELD_IDS.concat(CHK_IDS).forEach(id=>{
   el(id).addEventListener('input', render);
 });
 
-// подсветка чекбоксов
 document.querySelectorAll('.chk input').forEach(i=>{
   const sync = () => i.closest('.chk').classList.toggle('on', i.checked);
   i.addEventListener('change', sync);
