@@ -4,8 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Внутренний калькулятор — Офсет и Цифра</title>
-<!-- Более надежная библиотека для Excel (Cloudflare) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--berry:#8B1C42;--berry-dark:#6c1230;--berry-light:#FCF2F5;--blue:#6EA6D8;--ink:#1a1a1a;--muted:#666;--line:#e5ccd5;--ok:#1a7f37;--warn:#b34700;--danger:#c62828;--bg:#f7f5f6}
 *{box-sizing:border-box}html,body{margin:0}
@@ -1144,67 +1142,79 @@ function buildSnapshot(){
   };
 }
 
-function buildExcelBuffer(snap) {
+// Генерация Excel через HTML таблицу (не требует библиотек)
+function buildExcelHtml(snap) {
   const r = snap.result;
-  const aoa = [
-    ["Смета печати"],
-    ["Клиент:", snap.client || "—"],
-    ["Менеджер:", snap.employee],
-    ["Дата:", snap.savedAtLocal],
-    ["Параметры:", snap.summary],
-    [],
-    ["ФИНАНСОВЫЙ ИТОГ", "Сумма, ₽"],
-    ["Себестоимость", r.cost],
-    ["Оборот по проекту", r.typographyRevenue],
-    ["Бенефит менеджера", r.managerBenefit],
-    ["Доход типографии", r.typographyProfit],
-    ["Маржа типографии, %", r.typographyMargin],
-    [],
-    ["РАСШИФРОВКА СЕБЕСТОИМОСТИ"],
-    ["Раздел", "Статья", "Значение", "Детали"]
-  ];
-  
+  let xml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+  <head><meta charset="utf-8">
+  <!--[if gte mso 9]>
+  <xml>
+    <x:ExcelWorkbook>
+      <x:ExcelWorksheets>
+        <x:ExcelWorksheet>
+          <x:Name>Смета</x:Name>
+          <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+        </x:ExcelWorksheet>
+      </x:ExcelWorksheets>
+    </x:ExcelWorkbook>
+  </xml>
+  <![endif]-->
+  <style>
+    table { border-collapse: collapse; font-family: Arial, sans-serif; font-size: 10pt; }
+    th { background-color: #FCF2F5; color: #8B1C42; font-weight: bold; border: 1px solid #E5CCD5; padding: 6px; text-align: left; }
+    td { border: 1px solid #E5CCD5; padding: 6px; }
+    .title { font-size: 14pt; font-weight: bold; color: #8B1C42; }
+    .bold { font-weight: bold; }
+    .green { color: #1a7f37; font-weight: bold; }
+    .right { text-align: right; }
+  </style>
+  </head>
+  <body>
+  <table>
+    <tr><td colspan="4" class="title">Расчет стоимости печати</td></tr>
+    <tr><td class="bold">Клиент:</td><td colspan="3">${snap.client || '—'}</td></tr>
+    <tr><td class="bold">Менеджер:</td><td colspan="3">${snap.employee}</td></tr>
+    <tr><td class="bold">Дата:</td><td colspan="3">${snap.savedAtLocal}</td></tr>
+    <tr><td class="bold">Параметры:</td><td colspan="3">${snap.summary}</td></tr>
+    <tr><td colspan="4"></td></tr>
+    
+    <tr><th colspan="2">ФИНАНСОВЫЙ ИТОГ</th><th class="right">Сумма, ₽</th><th></th></tr>
+    <tr><td colspan="2">Себестоимость</td><td class="right">${r.cost}</td><td></td></tr>
+    <tr><td colspan="2">Оборот по проекту</td><td class="right">${r.typographyRevenue}</td><td></td></tr>
+    <tr><td colspan="2">Бенефит менеджера</td><td class="right">${r.managerBenefit}</td><td></td></tr>
+    <tr><td colspan="2" class="bold">Доход типографии</td><td class="right green">${r.typographyProfit}</td><td></td></tr>
+    <tr><td colspan="2">Маржа типографии, %</td><td class="right">${r.typographyMargin}%</td><td></td></tr>
+    <tr><td colspan="4"></td></tr>
+    
+    <tr><th>Раздел</th><th>Статья</th><th>Значение</th><th>Детали</th></tr>`;
+    
   snap.rows.forEach(row => {
-    aoa.push([row.section, row.label, row.value, row.detail]);
+    xml += `<tr><td>${row.section}</td><td>${row.label}</td><td class="right">${row.value}</td><td>${row.detail || ''}</td></tr>`;
   });
-
-  const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws['!cols'] = [{wch: 20}, {wch: 30}, {wch: 15}, {wch: 35}];
   
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Смета");
-  
-  return XLSX.write(wb, { type: "array", bookType: "xlsx" });
+  xml += `</table></body></html>`;
+  return '\uFEFF' + xml; // BOM для правильной кодировки в Excel
 }
 
 async function saveCalc(){
   const snap = buildSnapshot();
   const baseName = safeName(`${fileStamp(new Date())}_${snap.employee}_${snap.client || 'без клиента'}`);
   
-  if (typeof XLSX === 'undefined') {
-    toast('Ошибка: библиотека Excel не загрузилась. Проверьте интернет или отключите блокировщик рекламы.', true);
-    return;
-  }
-
-  let xlsBuffer;
-  try {
-    xlsBuffer = buildExcelBuffer(snap);
-  } catch (e) {
-    toast('Ошибка при создании файла Excel: ' + e.message, true);
-    return;
-  }
+  const html = buildExcelHtml(snap);
+  // Тип application/vnd.ms-excel заставляет Excel открывать файл как родной xls
+  const mimeType = 'application/vnd.ms-excel;charset=utf-8';
 
   const dir = await ensureDir();
   
   if(dir){
     try{
-      await writeFile(baseName+'.xlsx', xlsBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      toast(`Excel-файл сохранен в «${dir.name}»`);
+      await writeFile(baseName+'.xls', html, mimeType);
+      toast(`Файл Excel сохранен в «${dir.name}»`);
     }catch(e){ 
       toast('Ошибка записи файла: '+e.message, true); 
     }
   } else {
-    downloadFile(baseName+'.xlsx', xlsBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    downloadFile(baseName+'.xls', html, mimeType);
     toast('Excel-файл скачан в «Загрузки»');
   }
   
