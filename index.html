@@ -1146,44 +1146,8 @@ function buildSnapshot(){
   };
 }
 
-// --- ФУНКЦИЯ ДОПИСЫВАНИЯ В ОБЩИЙ CSV ЖУРНАЛ ---
-async function appendToJournal(snap) {
-  if (!dirHandle) return false;
-  const fileName = 'Журнал_расчетов.csv';
-  try {
-    let fileHandle;
-    try {
-      fileHandle = await dirHandle.getFileHandle(fileName);
-    } catch (e) {
-      fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
-      const header = '\uFEFF"Дата";"Сотрудник";"Клиент";"Параметры";"Себестоимость";"Оборот";"Бенефит";"Доход";"Маржа %";"Комментарий"\n';
-      const writable = await fileHandle.createWritable();
-      await writable.write(header);
-      await writable.close();
-    }
-    
-    // Читаем существующий файл, чтобы дописать в конец
-    const file = await fileHandle.getFile();
-    const text = await file.text();
-    
-    const r = snap.result;
-    const row = `"${snap.savedAtLocal}";"${snap.employee}";"${snap.client || '—'}";"${snap.summary}";"${r.cost}";"${r.typographyRevenue}";"${r.managerBenefit}";"${r.typographyProfit}";"${r.typographyMargin}";"${snap.note || ''}"\n`;
-    
-    const writable = await fileHandle.createWritable();
-    await writable.write(text + row);
-    await writable.close();
-    return true;
-  } catch (e) {
-    console.error(e);
-    return false;
-  }
-}
-
-// --- ФУНКЦИЯ ВЫГРУЗКИ ВСЕЙ ИСТОРИИ В ОДИН EXCEL ---
-function exportWholeHistory() {
-  const h = getHistory();
-  if (!h.length) { toast('Журнал пуст', true); return; }
-  
+// --- ГЕНЕРАТОР EXCEL ---
+function buildExcelTable(snapshots) {
   let xml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
   <head><meta charset="utf-8">
   <style>
@@ -1207,7 +1171,7 @@ function exportWholeHistory() {
     <th>Комментарий</th>
   </tr>`;
   
-  h.forEach(s => {
+  snapshots.forEach(s => {
     const r = s.result || {};
     xml += `<tr>
       <td>${s.savedAtLocal}</td>
@@ -1223,9 +1187,30 @@ function exportWholeHistory() {
     </tr>`;
   });
   xml += `</table></body></html>`;
-  
+  return '\uFEFF' + xml;
+}
+
+// --- ЗАПИСЬ ОБЩЕГО ЖУРНАЛА В ПАПКУ (перезапись .xls) ---
+async function updateJournalFile() {
+  if (!dirHandle) return false;
+  try {
+    const h = getHistory();
+    const html = buildExcelTable(h);
+    await writeFile('Журнал_расчетов.xls', html, 'application/vnd.ms-excel;charset=utf-8');
+    return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
+}
+
+// --- ВЫГРУЗКА ЧЕРЕЗ СКАЧИВАНИЕ ---
+function exportWholeHistory() {
+  const h = getHistory();
+  if (!h.length) { toast('Журнал пуст', true); return; }
+  const html = buildExcelTable(h);
   const baseName = `Общий_журнал_расчетов_${fileStamp(new Date())}.xls`;
-  downloadFile(baseName, '\uFEFF' + xml, 'application/vnd.ms-excel;charset=utf-8');
+  downloadFile(baseName, html, 'application/vnd.ms-excel;charset=utf-8');
   toast('Общий журнал выгружен!');
 }
 
@@ -1236,11 +1221,11 @@ async function saveCalc(){
   pushHistory(snap); 
   renderHistory();
   
-  // 2. Пытаемся дописать в файл (если выбрана папка)
+  // 2. Если выбрана папка, обновляем единый файл Журнал_расчетов.xls
   if (dirHandle) {
-    const success = await appendToJournal(snap);
+    const success = await updateJournalFile();
     if (success) {
-      toast('Строчка добавлена в общий файл Журнал_расчетов.csv');
+      toast('Строчка добавлена в общий файл Журнал_расчетов.xls');
     } else {
       toast('Ошибка записи в файл, но добавлено в Историю', true);
     }
