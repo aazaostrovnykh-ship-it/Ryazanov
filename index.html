@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Внутренний калькулятор — Офсет и Цифра</title>
+<!-- Подключение библиотеки для создания Excel -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 <style>
 :root{--berry:#8B1C42;--berry-dark:#6c1230;--berry-light:#FCF2F5;--blue:#6EA6D8;--ink:#1a1a1a;--muted:#666;--line:#e5ccd5;--ok:#1a7f37;--warn:#b34700;--danger:#c62828;--bg:#f7f5f6}
 *{box-sizing:border-box}html,body{margin:0}
@@ -435,6 +437,14 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
       <div class="retail-info" id="retailInfo" style="display:none"></div>
 
       <details id="detailBlock"><summary>Полная детализация</summary><div id="rows"></div></details>
+
+      <!-- ВЫБОР ФОРМАТОВ -->
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:14px;">
+        <span style="color:var(--muted);font-weight:500;font-size:13px;">При сохранении:</span>
+        <label class="chk on"><input type="checkbox" id="saveHtml" checked> 📄 HTML</label>
+        <label class="chk on"><input type="checkbox" id="saveJson" checked> 🗄 JSON</label>
+        <label class="chk on"><input type="checkbox" id="saveXls" checked> 📊 Excel</label>
+      </div>
 
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
         <button class="btn primary" id="saveBtn" style="flex:1;padding:12px">💾 Сохранить</button>
@@ -1142,6 +1152,39 @@ function buildSnapshot(){
   };
 }
 
+function buildExcelBuffer(snap) {
+  const r = snap.result;
+  const aoa = [
+    ["Смета печати"],
+    ["Клиент:", snap.client || "—"],
+    ["Менеджер:", snap.employee],
+    ["Дата:", snap.savedAtLocal],
+    ["Параметры:", snap.summary],
+    [],
+    ["ФИНАНСОВЫЙ ИТОГ", "Сумма, ₽"],
+    ["Себестоимость", r.cost],
+    ["Оборот по проекту", r.typographyRevenue],
+    ["Бенефит менеджера", r.managerBenefit],
+    ["Доход типографии", r.typographyProfit],
+    ["Маржа типографии, %", r.typographyMargin],
+    [],
+    ["РАСШИФРОВКА СЕБЕСТОИМОСТИ"],
+    ["Раздел", "Статья", "Значение", "Детали"]
+  ];
+  
+  snap.rows.forEach(row => {
+    aoa.push([row.section, row.label, row.value, row.detail]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{wch: 20}, {wch: 30}, {wch: 15}, {wch: 35}];
+  
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Смета");
+  
+  return XLSX.write(wb, { type: "array", bookType: "xlsx" });
+}
+
 function buildHtmlSmeta(snap){
   const r = snap.result;
   const sections = {};
@@ -1188,21 +1231,48 @@ ${alarmHtml}
 async function saveCalc(){
   const snap = buildSnapshot();
   const baseName = safeName(`${fileStamp(new Date())}_${snap.employee}_${snap.client || 'без клиента'}`);
-  const html = buildHtmlSmeta(snap);
-  const json = JSON.stringify(snap, null, 2);
+  
+  const doHtml = el('saveHtml').checked;
+  const doJson = el('saveJson').checked;
+  const doXls = el('saveXls').checked;
+
+  if(!doHtml && !doJson && !doXls) {
+    toast('Выберите хотя бы один формат для сохранения!', true);
+    return;
+  }
+
+  const html = doHtml ? buildHtmlSmeta(snap) : '';
+  const json = doJson ? JSON.stringify(snap, null, 2) : '';
+  let xlsBuffer = null;
+
+  if (doXls) {
+    if (typeof XLSX === 'undefined') {
+      toast('Ошибка: библиотека Excel не загрузилась (проверьте интернет).', true);
+      return;
+    }
+    xlsBuffer = buildExcelBuffer(snap);
+  }
+
   const dir = await ensureDir();
+  
   if(dir){
     try{
-      await writeFile(baseName+'.html', html, 'text/html;charset=utf-8');
-      await writeFile(baseName+'.json', json, 'application/json;charset=utf-8');
+      if(doHtml) await writeFile(baseName+'.html', html, 'text/html;charset=utf-8');
+      if(doJson) await writeFile(baseName+'.json', json, 'application/json;charset=utf-8');
+      if(xlsBuffer) await writeFile(baseName+'.xlsx', xlsBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       toast(`Сохранено в «${dir.name}»`);
-    }catch(e){ toast('Ошибка: '+e.message, true); }
+    }catch(e){ 
+      toast('Ошибка записи файлов: '+e.message, true); 
+    }
   } else {
-    downloadFile(baseName+'.html', html, 'text/html');
-    downloadFile(baseName+'.json', json, 'application/json');
+    if(doHtml) downloadFile(baseName+'.html', html, 'text/html');
+    if(doJson) downloadFile(baseName+'.json', json, 'application/json');
+    if(xlsBuffer) downloadFile(baseName+'.xlsx', xlsBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     toast('Скачано в «Загрузки»');
   }
-  pushHistory(snap); renderHistory();
+  
+  pushHistory(snap); 
+  renderHistory();
 }
 
 el('folderBtn').addEventListener('click', pickFolder);
