@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Внутренний калькулятор — Офсет и Цифра</title>
-<!-- Подключение библиотеки для создания Excel -->
-<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<!-- Более надежная библиотека для Excel (Cloudflare) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--berry:#8B1C42;--berry-dark:#6c1230;--berry-light:#FCF2F5;--blue:#6EA6D8;--ink:#1a1a1a;--muted:#666;--line:#e5ccd5;--ok:#1a7f37;--warn:#b34700;--danger:#c62828;--bg:#f7f5f6}
 *{box-sizing:border-box}html,body{margin:0}
@@ -438,16 +438,8 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
 
       <details id="detailBlock"><summary>Полная детализация</summary><div id="rows"></div></details>
 
-      <!-- ВЫБОР ФОРМАТОВ -->
-      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:14px;">
-        <span style="color:var(--muted);font-weight:500;font-size:13px;">При сохранении:</span>
-        <label class="chk on"><input type="checkbox" id="saveHtml" checked> 📄 HTML</label>
-        <label class="chk on"><input type="checkbox" id="saveJson" checked> 🗄 JSON</label>
-        <label class="chk on"><input type="checkbox" id="saveXls" checked> 📊 Excel</label>
-      </div>
-
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-        <button class="btn primary" id="saveBtn" style="flex:1;padding:12px">💾 Сохранить</button>
+        <button class="btn primary" id="saveBtn" style="flex:1;padding:12px">💾 Сохранить (Excel)</button>
         <button class="btn" id="printBtn" style="flex:1;padding:12px">🖨 Печать / PDF</button>
         <button class="btn" id="copyBtn" style="flex:1;padding:12px">📋 Скопировать</button>
       </div>
@@ -1185,90 +1177,35 @@ function buildExcelBuffer(snap) {
   return XLSX.write(wb, { type: "array", bookType: "xlsx" });
 }
 
-function buildHtmlSmeta(snap){
-  const r = snap.result;
-  const sections = {};
-  (snap.rows || []).forEach(row => { (sections[row.section] = sections[row.section] || []).push(row); });
-  let sectionsHtml = '';
-  for(const name in sections){
-    sectionsHtml += `<div class="section"><div class="sec-title">${escHtml(name)}</div>`;
-    sections[name].forEach(row=>{
-      const det = row.detail ? ` <span class="det">${escHtml(row.detail)}</span>` : '';
-      sectionsHtml += `<div class="row"><span>${escHtml(row.label)}</span><span>${escHtml(row.value)}${det}</span></div>`;
-    });
-    sectionsHtml += '</div>';
-  }
-  const modeName = snap.mode === 'digital' ? 'Цифровая' : 'Офсетная';
-  const alarmHtml = r.typographyRevenue < r.minPrice
-    ? `<div style="margin:15px 0;padding:12px;background:#fdeeee;border:2px solid #c62828;border-radius:8px;color:#c62828;font-weight:bold;text-align:center;">⚠️ Недополучает ${fmt(r.minPrice-r.typographyRevenue)} ₽ до минимума ${fmt(r.minPrice)} ₽!</div>` : '';
-  return `<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><title>Смета</title>
-<style>body{font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:40px 20px;color:#1a1a1a;font-size:14px}
-.head{border-bottom:3px solid #8B1C42;padding-bottom:15px;margin-bottom:20px}.head h1{color:#8B1C42;margin:0 0 4px;font-size:22px}
-.sub{color:#666;font-size:13px}.meta{color:#555;margin-bottom:20px;line-height:1.7}.meta b{color:#1a1a1a}
-.kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}.k{background:#FCF2F5;padding:10px 12px;border-radius:8px}
-.k .l{font-size:10px;color:#666;text-transform:uppercase;font-weight:600}.k .v{font-size:18px;color:#8B1C42;font-weight:500;margin-top:2px}
-.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;color:#2b6da8;padding-top:8px;border-top:1px solid #eee;margin-top:12px}
-.row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px dashed #eee}
-.det{color:#aaa;font-size:11px;margin-left:4px}.total{padding:10px 0;margin-top:10px;border-top:2px solid #2b6da8;font-weight:600;color:#8B1C42;display:flex;justify-content:space-between}
-.foot{margin-top:20px;color:#999;font-size:11px;text-align:center;border-top:1px solid #eee;padding-top:10px}</style>
-</head><body>
-<div class="head"><h1>Расчет стоимости печати</h1><div class="sub">Смета ${modeName} печати · ${escHtml(snap.summary)}</div></div>
-<div class="meta"><b>Клиент:</b> ${escHtml(snap.client||'—')}<br><b>Менеджер:</b> ${escHtml(snap.employee)}<br><b>Дата:</b> ${escHtml(snap.savedAtLocal)}</div>
-<div class="kpi">
-<div class="k"><div class="l">Себестоимость</div><div class="v">${fmt(r.cost)} ₽</div><div style="font-size:11px;color:#888">${fmt2(r.costPerUnit)} ₽/шт</div></div>
-<div class="k"><div class="l">Оборот по проекту</div><div class="v">${fmt(r.typographyRevenue)} ₽</div></div>
-<div class="k"><div class="l">Бенефит</div><div class="v">${fmt(r.managerBenefit)} ₽</div></div>
-</div>
-${alarmHtml}
-<div class="section"><div class="sec-title">Себестоимость по статьям</div>${sectionsHtml}<div class="total"><span>Итого себестоимость</span><span>${fmt(r.cost)} ₽</span></div></div>
-<div style="margin-top:15px;padding:10px;background:#eef9f1;border:1px solid #c3e9cf;border-radius:8px;font-weight:bold;color:#1a7f37;display:flex;justify-content:space-between">
-<span>Доход типографии (чистая прибыль):</span><span>${fmt(r.typographyProfit)} ₽ (${fmt2(r.typographyMargin)}%)</span>
-</div>
-<div class="foot">Смета сформирована внутренним калькулятором · ${escHtml(snap.savedAtLocal)}</div>
-</body></html>`;
-}
-
 async function saveCalc(){
   const snap = buildSnapshot();
   const baseName = safeName(`${fileStamp(new Date())}_${snap.employee}_${snap.client || 'без клиента'}`);
   
-  const doHtml = el('saveHtml').checked;
-  const doJson = el('saveJson').checked;
-  const doXls = el('saveXls').checked;
-
-  if(!doHtml && !doJson && !doXls) {
-    toast('Выберите хотя бы один формат для сохранения!', true);
+  if (typeof XLSX === 'undefined') {
+    toast('Ошибка: библиотека Excel не загрузилась. Проверьте интернет или отключите блокировщик рекламы.', true);
     return;
   }
 
-  const html = doHtml ? buildHtmlSmeta(snap) : '';
-  const json = doJson ? JSON.stringify(snap, null, 2) : '';
-  let xlsBuffer = null;
-
-  if (doXls) {
-    if (typeof XLSX === 'undefined') {
-      toast('Ошибка: библиотека Excel не загрузилась (проверьте интернет).', true);
-      return;
-    }
+  let xlsBuffer;
+  try {
     xlsBuffer = buildExcelBuffer(snap);
+  } catch (e) {
+    toast('Ошибка при создании файла Excel: ' + e.message, true);
+    return;
   }
 
   const dir = await ensureDir();
   
   if(dir){
     try{
-      if(doHtml) await writeFile(baseName+'.html', html, 'text/html;charset=utf-8');
-      if(doJson) await writeFile(baseName+'.json', json, 'application/json;charset=utf-8');
-      if(xlsBuffer) await writeFile(baseName+'.xlsx', xlsBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      toast(`Сохранено в «${dir.name}»`);
+      await writeFile(baseName+'.xlsx', xlsBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      toast(`Excel-файл сохранен в «${dir.name}»`);
     }catch(e){ 
-      toast('Ошибка записи файлов: '+e.message, true); 
+      toast('Ошибка записи файла: '+e.message, true); 
     }
   } else {
-    if(doHtml) downloadFile(baseName+'.html', html, 'text/html');
-    if(doJson) downloadFile(baseName+'.json', json, 'application/json');
-    if(xlsBuffer) downloadFile(baseName+'.xlsx', xlsBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    toast('Скачано в «Загрузки»');
+    downloadFile(baseName+'.xlsx', xlsBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    toast('Excel-файл скачан в «Загрузки»');
   }
   
   pushHistory(snap); 
