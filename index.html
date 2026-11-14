@@ -42,8 +42,12 @@ select,input[type=number],input[type=text]{width:100%;padding:10px 11px;border:1
 .chk input{accent-color:var(--berry);width:15px;height:15px;cursor:pointer;margin:0}
 .deal-block{margin-top:14px;padding:14px;background:#fff;border:2px solid var(--blue);border-radius:12px}
 .deal-block h4{margin:0 0 10px;font-size:14px;color:#2b6da8;font-weight:600;display:flex;align-items:center;gap:6px}
+
+/* Сетка KPI */
 .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:640px){.kpi-grid{grid-template-columns:1fr}}
+.kpi-grid.three{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:640px){.kpi-grid,.kpi-grid.three{grid-template-columns:1fr}}
+
 .kpi{background:var(--berry-light);border-radius:12px;padding:12px 14px;border:1px solid rgba(139,28,66,.06)}
 .kpi-l{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 .kpi-v{display:block;font-size:24px;font-weight:500;color:var(--berry);letter-spacing:-.5px;margin-top:3px}
@@ -86,7 +90,7 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
 <body>
 
 <div class="topbar">
-  <div class="brand">Типография · внутренний калькулятор<small>Себестоимость, договорная цена и бенефит</small></div>
+  <div class="brand">Внутренний калькулятор<small>Себестоимость, договорная цена и бенефит</small></div>
   <div class="mode-tabs">
     <button class="mode-tab active" id="btn-offset" onclick="setMode('offset')">Офсет</button>
     <button class="mode-tab" id="btn-digital" onclick="setMode('digital')">Цифра</button>
@@ -354,7 +358,7 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
     <div class="card">
       <h3>Данные заказа</h3>
       <div class="grid">
-        <div><label class="fld">Клиент / заказ</label><input type="text" id="clientName" placeholder="Храм Св. Татианы — буклет"></div>
+        <div><label class="fld">Клиент / заказ</label><input type="text" id="clientName" placeholder="Название заказа"></div>
         <div><label class="fld">Комментарий</label><input type="text" id="note" placeholder="Спуск, нюансы"></div>
       </div>
     </div>
@@ -375,16 +379,19 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
     <div class="card" id="printArea">
       <h3>Расчёт <span class="badge" id="calcBadge">—</span></h3>
 
+      <!-- ВЕРХНИЙ БЛОК: Затраты -->
       <div class="kpi-grid">
         <div class="kpi"><span class="kpi-l">Себестоимость</span><span class="kpi-v" id="kCost">—</span><span class="kpi-s" id="kCostUnit">—</span></div>
         <div class="kpi red" id="minPriceBlock"><span class="kpi-l">Минимальная цена (маржа <span id="lblMinMargin">10</span>%)</span><span class="kpi-v" id="kMin">—</span><span class="kpi-s" id="kMinUnit">—</span></div>
       </div>
 
+      <!-- СРЕДНИЙ БЛОК: Рыночные цены -->
       <div class="kpi-grid" style="margin-top:10px">
         <div class="kpi blue"><span class="kpi-l" id="lblMarketTitle">Рыночный прайс (наценка <span id="lblMarkup">41</span>%)</span><span class="kpi-v" id="kMarket">—</span><span class="kpi-s" id="kMarketUnit">—</span></div>
         <div class="kpi blue"><span class="kpi-l">Рыночный прайс + бенефит</span><span class="kpi-v" id="kMarketPlusBenefit">—</span><span class="kpi-s" id="kMarketPlusBenefitUnit">—</span></div>
       </div>
 
+      <!-- БЛОК СДЕЛКИ -->
       <div class="deal-block">
         <h4>🤝 Сделка с клиентом</h4>
         <div class="grid">
@@ -393,12 +400,26 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
         </div>
       </div>
 
-      <div class="kpi-grid" style="margin-top:14px">
-        <div class="kpi green" id="typographyRevenueBlock"><span class="kpi-l">Типография получает</span><span class="kpi-v" id="typographyRevenue">—</span><span class="kpi-s" id="typographyRevenueUnit">—</span></div>
-        <div class="kpi green" id="typographyProfitBlock"><span class="kpi-l">Прибыль типографии</span><span class="kpi-v" id="typographyProfit">—</span><span class="kpi-s" id="typographyMargin">—</span></div>
+      <!-- НИЖНИЙ БЛОК: Итоги (3 колонки) -->
+      <div class="kpi-grid three" style="margin-top:14px">
+        <div class="kpi green" id="typographyRevenueBlock">
+          <span class="kpi-l">Оборот по проекту</span>
+          <span class="kpi-v" id="typographyRevenue">—</span>
+          <span class="kpi-s" id="typographyRevenueUnit">—</span>
+        </div>
+        <div class="kpi blue" id="managerBenefitBlock">
+          <span class="kpi-l">Бенефит менеджера</span>
+          <span class="kpi-v" id="managerBenefitDisplay">—</span>
+          <span class="kpi-s" id="managerBenefitUnit">—</span>
+        </div>
+        <div class="kpi green" id="typographyProfitBlock">
+          <span class="kpi-l">Доход типографии</span>
+          <span class="kpi-v" id="typographyProfit">—</span>
+          <span class="kpi-s" id="typographyMargin">—</span>
+        </div>
       </div>
 
-      <div id="alarmWarning" class="alarm-warning">⚠️ АЛАРМ! Типография недополучает <b id="alarmShortage">0</b> ₽ до минимальной цены <b id="alarmMinPrice">0</b> ₽.</div>
+      <div id="alarmWarning" class="alarm-warning">⚠️ АЛАРМ! Оборот меньше минимальной цены на <b id="alarmShortage">0</b> ₽.</div>
 
       <div class="grid three" style="margin-top:14px">
         <div id="markupWrap"><label class="fld">Наценка, %</label><input type="number" id="markup" value="41" step="1" min="0" max="500"></div>
@@ -453,9 +474,7 @@ const DEFAULT_CFG = {
     '250': { name:'Мелованная 250 г/м²', packSize:300, packCost:1700, packPrice:3300 },
     '300': { name:'Мелованная 300 г/м²', packSize:250, packCost:1600, packPrice:3000 }
   },
-  cut: 1.0,
-  crease: 2.5,
-  fold: 1.5,
+  cut: 1.0, crease: 2.5, fold: 1.5,
   lam: { lam1: 10, lam2: 20 },
   itemsPerA2: { A5:8, A4:4, A3:2 },
   pagesPerA2: { A5:16, A4:8 },
@@ -465,10 +484,8 @@ const DEFAULT_CFG = {
   digital: {
     bulkThreshold: 50,
     printPrices: {
-      '1+0': {base:20, bulk:20},
-      '1+1': {base:20, bulk:20},
-      '4+0': {base:25, bulk:20},
-      '4+4': {base:50, bulk:40}
+      '1+0': {base:20, bulk:20}, '1+1': {base:20, bulk:20},
+      '4+0': {base:25, bulk:20}, '4+4': {base:50, bulk:40}
     },
     printCosts: { '1+0':10, '1+1':10, '4+0':12, '4+4':22 },
     paper: {
@@ -845,9 +862,11 @@ function render(){
 
   const managerBenefit = Math.max(0, num(el('managerBenefit').value, 0));
   const marketPlusBenefit = marketPrice + managerBenefit;
+  
   const typographyRevenue = contractPrice - managerBenefit;
   const typographyProfit = typographyRevenue - cost;
   const typographyMargin = typographyRevenue > 0 ? (typographyProfit/typographyRevenue*100) : 0;
+  
   const isAlarm = typographyRevenue < minPrice;
 
   el('kCost').textContent = fmt(cost)+' ₽';
@@ -858,10 +877,16 @@ function render(){
   el('kMinUnit').textContent = fmt2(minPrice/r.qty)+' ₽ / шт';
   el('kMarketPlusBenefit').textContent = fmt(marketPlusBenefit)+' ₽';
   el('kMarketPlusBenefitUnit').textContent = fmt2(marketPlusBenefit/r.qty)+' ₽ / шт';
+
   el('typographyRevenue').textContent = fmt(typographyRevenue)+' ₽';
   el('typographyRevenueUnit').textContent = fmt2(typographyRevenue/r.qty)+' ₽ / шт';
+  
+  el('managerBenefitDisplay').textContent = fmt(managerBenefit)+' ₽';
+  el('managerBenefitUnit').textContent = fmt2(managerBenefit/r.qty)+' ₽ / шт';
+  
   el('typographyProfit').textContent = fmt(typographyProfit)+' ₽';
   el('typographyMargin').textContent = fmt2(typographyMargin)+'% маржа';
+
   if(currentMode === 'offset') el('lblMarkup').textContent = fmt2(markup);
   el('lblMinMargin').textContent = fmt2(minMargin);
   el('calcBadge').textContent = r.summary;
@@ -871,7 +896,6 @@ function render(){
     el('minPriceBlock').classList.add('alarm');
     el('alarmWarning').style.display = 'block';
     el('alarmShortage').textContent = fmt(minPrice - typographyRevenue);
-    el('alarmMinPrice').textContent = fmt(minPrice);
   } else {
     el('typographyRevenueBlock').classList.remove('alarm');
     el('minPriceBlock').classList.remove('alarm');
@@ -1138,23 +1162,25 @@ function buildHtmlSmeta(snap){
 <style>body{font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:40px 20px;color:#1a1a1a;font-size:14px}
 .head{border-bottom:3px solid #8B1C42;padding-bottom:15px;margin-bottom:20px}.head h1{color:#8B1C42;margin:0 0 4px;font-size:22px}
 .sub{color:#666;font-size:13px}.meta{color:#555;margin-bottom:20px;line-height:1.7}.meta b{color:#1a1a1a}
-.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}.k{background:#FCF2F5;padding:10px 12px;border-radius:8px}
+.kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}.k{background:#FCF2F5;padding:10px 12px;border-radius:8px}
 .k .l{font-size:10px;color:#666;text-transform:uppercase;font-weight:600}.k .v{font-size:18px;color:#8B1C42;font-weight:500;margin-top:2px}
 .sec-title{font-size:11px;font-weight:700;text-transform:uppercase;color:#2b6da8;padding-top:8px;border-top:1px solid #eee;margin-top:12px}
 .row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px dashed #eee}
 .det{color:#aaa;font-size:11px;margin-left:4px}.total{padding:10px 0;margin-top:10px;border-top:2px solid #2b6da8;font-weight:600;color:#8B1C42;display:flex;justify-content:space-between}
 .foot{margin-top:20px;color:#999;font-size:11px;text-align:center;border-top:1px solid #eee;padding-top:10px}</style>
 </head><body>
-<div class="head"><h1>Типография Екатеринбургской Епархии</h1><div class="sub">Смета ${modeName} печати · ${escHtml(snap.summary)}</div></div>
+<div class="head"><h1>Расчет стоимости печати</h1><div class="sub">Смета ${modeName} печати · ${escHtml(snap.summary)}</div></div>
 <div class="meta"><b>Клиент:</b> ${escHtml(snap.client||'—')}<br><b>Менеджер:</b> ${escHtml(snap.employee)}<br><b>Дата:</b> ${escHtml(snap.savedAtLocal)}</div>
 <div class="kpi">
 <div class="k"><div class="l">Себестоимость</div><div class="v">${fmt(r.cost)} ₽</div><div style="font-size:11px;color:#888">${fmt2(r.costPerUnit)} ₽/шт</div></div>
-<div class="k"><div class="l">Мин. цена</div><div class="v">${fmt(r.minPrice)} ₽</div></div>
-<div class="k"><div class="l">Договорная</div><div class="v">${fmt(r.contractPrice)} ₽</div></div>
+<div class="k"><div class="l">Оборот по проекту</div><div class="v">${fmt(r.typographyRevenue)} ₽</div></div>
 <div class="k"><div class="l">Бенефит</div><div class="v">${fmt(r.managerBenefit)} ₽</div></div>
 </div>
 ${alarmHtml}
-<div class="section"><div class="sec-title">Себестоимость по статьям</div>${sectionsHtml}<div class="total"><span>Итого</span><span>${fmt(r.cost)} ₽</span></div></div>
+<div class="section"><div class="sec-title">Себестоимость по статьям</div>${sectionsHtml}<div class="total"><span>Итого себестоимость</span><span>${fmt(r.cost)} ₽</span></div></div>
+<div style="margin-top:15px;padding:10px;background:#eef9f1;border:1px solid #c3e9cf;border-radius:8px;font-weight:bold;color:#1a7f37;display:flex;justify-content:space-between">
+<span>Доход типографии (чистая прибыль):</span><span>${fmt(r.typographyProfit)} ₽ (${fmt2(r.typographyMargin)}%)</span>
+</div>
 <div class="foot">Смета сформирована внутренним калькулятором · ${escHtml(snap.savedAtLocal)}</div>
 </body></html>`;
 }
@@ -1195,9 +1221,10 @@ ${s.summary}
 Рын. прайс:         ${fmt(r.marketPrice)} ₽
 ------------------------------------------
 Договорная цена:    ${fmt(r.contractPrice)} ₽
-Бенефит:            ${fmt(r.managerBenefit)} ₽
-Типография получает:${fmt(r.typographyRevenue)} ₽
-Прибыль:            ${fmt(r.typographyProfit)} ₽ (${fmt2(r.typographyMargin)}%)
+Оборот по проекту:  ${fmt(r.typographyRevenue)} ₽
+Бенефит менеджера:  ${fmt(r.managerBenefit)} ₽
+------------------------------------------
+Доход типографии:   ${fmt(r.typographyProfit)} ₽ (${fmt2(r.typographyMargin)}%)
 ${r.typographyRevenue < r.minPrice ? '⚠️ Недополучает '+fmt(r.minPrice-r.typographyRevenue)+' ₽ до минимума!\n' : ''}
 ${s.note ? 'Комментарий: '+s.note : ''}`;
   navigator.clipboard.writeText(txt).then(()=>toast('Скопировано')).catch(err=>toast('Ошибка: '+err.message, true));
@@ -1212,14 +1239,15 @@ function renderHistory(){
   el('histCount').textContent = h.length;
   if(!h.length){ box.innerHTML = '<div class="empty">Пока пусто</div>'; return; }
   box.innerHTML = h.map((s,i)=>{
-    const price = s.result?.contractPrice || 0;
+    const price = s.result?.typographyRevenue || 0;
+    const profit = s.result?.typographyProfit || 0;
     const modeBadge = s.mode === 'digital' ? '<span class="mode-badge dig">цифра</span>' : '<span class="mode-badge off">офсет</span>';
     const benefitTag = s.result?.managerBenefit > 0 ? ` · 💰 ${fmt(s.result.managerBenefit)}` : '';
     const alarmTag = s.result && s.result.typographyRevenue < s.result.minPrice ? ' · ⚠️' : '';
     return `<div class="hist-item">
       <div class="hist-main">${modeBadge}<b>${escHtml(s.client||'Без клиента')}</b>
       <small>${escHtml(s.savedAtLocal)} · ${escHtml(s.employee||'')} · ${escHtml(s.summary||'')}${benefitTag}${alarmTag}</small></div>
-      <div class="hist-price">${fmt(price)} ₽</div>
+      <div class="hist-price" title="Оборот / Доход">${fmt(price)} / ${fmt(profit)} ₽</div>
       <button class="icon-btn" data-del="${i}">✕</button>
     </div>`;
   }).join('');
