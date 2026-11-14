@@ -3,400 +3,368 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Внутренний калькулятор офсета — Типография</title>
+<title>Внутренний калькулятор — Офсет и Цифра</title>
 <style>
-:root{
-  --berry:#8B1C42; --berry-dark:#6c1230; --berry-light:#FCF2F5;
-  --blue:#6EA6D8; --ink:#1a1a1a; --muted:#666; --line:#e5ccd5;
-  --ok:#1a7f37; --warn:#b34700; --danger:#c62828; --bg:#f7f5f6;
-}
-*{box-sizing:border-box}
-html,body{margin:0}
+:root{--berry:#8B1C42;--berry-dark:#6c1230;--berry-light:#FCF2F5;--blue:#6EA6D8;--ink:#1a1a1a;--muted:#666;--line:#e5ccd5;--ok:#1a7f37;--warn:#b34700;--danger:#c62828;--bg:#f7f5f6}
+*{box-sizing:border-box}html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;-webkit-font-smoothing:antialiased}
-
-/* ---------- Топбар ---------- */
-.topbar{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line);
-  padding:10px 18px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;
-  box-shadow:0 2px 10px rgba(139,28,66,.06)}
+.topbar{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-shadow:0 2px 10px rgba(139,28,66,.06)}
 .topbar .brand{font-weight:600;color:var(--berry);font-size:16px;letter-spacing:-.2px}
 .topbar .brand small{display:block;font-weight:400;font-size:11px;color:var(--muted);letter-spacing:0}
 .topbar-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .topbar label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;margin:0}
 .topbar select{padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink);outline:none}
-.topbar select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(110,166,216,.15)}
-
+.mode-tabs{display:flex;gap:6px;background:#f0e8ec;padding:4px;border-radius:10px}
+.mode-tab{padding:8px 18px;border-radius:8px;border:none;background:transparent;font-family:inherit;font-size:14px;font-weight:500;color:var(--berry);cursor:pointer;transition:.15s}
+.mode-tab.active{background:#fff;box-shadow:0 2px 6px rgba(139,28,66,.15);color:var(--berry)}
+.mode-tab:hover:not(.active){background:rgba(255,255,255,.5)}
 .btn{font-family:inherit;cursor:pointer;border-radius:9px;font-size:13px;font-weight:500;transition:.15s;border:1px solid var(--line);background:#fff;color:var(--berry);padding:8px 13px}
 .btn:hover{background:var(--berry-light)}
 .btn.primary{background:var(--berry);color:#fff;border-color:var(--berry);box-shadow:0 4px 12px rgba(139,28,66,.18)}
 .btn.primary:hover{background:var(--berry-dark)}
 .btn.ok{background:#eaf7ee;border-color:#b7e4c7;color:var(--ok)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-
-/* ---------- Сетка ---------- */
 .layout{max-width:1420px;margin:0 auto;padding:18px;display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);gap:18px;align-items:start}
 @media(max-width:1080px){.layout{grid-template-columns:1fr}}
-
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 4px 18px rgba(139,28,66,.045)}
 .card h3{margin:0 0 14px;font-size:16px;color:var(--berry);font-weight:600;display:flex;align-items:center;gap:8px}
 .card h3 .badge{font-size:11px;font-weight:500;background:var(--berry-light);color:var(--berry);padding:3px 8px;border-radius:20px}
-
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid.three{grid-template-columns:1fr 1fr 1fr}
 @media(max-width:640px){.grid,.grid.three{grid-template-columns:1fr}}
 label.fld{display:block;font-size:12px;font-weight:600;color:var(--berry);margin-bottom:5px;letter-spacing:.2px}
-select,input[type=number],input[type=text],textarea{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;color:var(--ink);background:#fff;outline:none;font-family:inherit;transition:.15s}
-textarea{resize:vertical;min-height:56px}
-select:focus,input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(110,166,216,.15)}
-
+select,input[type=number],input[type=text]{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;color:var(--ink);background:#fff;outline:none;font-family:inherit;transition:.15s}
 .subblock{margin-top:14px;padding:14px;background:var(--berry-light);border-radius:11px;border:1px dashed rgba(139,28,66,.35)}
 .subblock h4{margin:0 0 10px;font-size:13px;color:var(--berry);font-weight:600}
 .subblock h4.divider{border-top:1px solid var(--line);padding-top:10px;margin-top:12px}
-
 .chks{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
 .chk{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);padding:8px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:var(--berry);margin:0;transition:.15s;user-select:none}
-.chk:hover{background:var(--berry-light)}
-.chk input{accent-color:var(--berry);width:15px;height:15px;cursor:pointer;margin:0}
 .chk.on{background:#fff;border-color:var(--blue);box-shadow:0 2px 6px rgba(110,166,216,.18)}
-
-/* ---------- Блок Сделки ---------- */
+.chk input{accent-color:var(--berry);width:15px;height:15px;cursor:pointer;margin:0}
 .deal-block{margin-top:14px;padding:14px;background:#fff;border:2px solid var(--blue);border-radius:12px}
 .deal-block h4{margin:0 0 10px;font-size:14px;color:#2b6da8;font-weight:600;display:flex;align-items:center;gap:6px}
-
-/* ---------- KPI ---------- */
 .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:640px){.kpi-grid{grid-template-columns:1fr}}
-.kpi{background:var(--berry-light);border-radius:12px;padding:12px 14px;border:1px solid rgba(139,28,66,.06);transition: all 0.3s ease}
+.kpi{background:var(--berry-light);border-radius:12px;padding:12px 14px;border:1px solid rgba(139,28,66,.06)}
 .kpi-l{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.kpi-l small{display:block;font-weight:400;text-transform:none;letter-spacing:0;font-size:10.5px;margin-top:2px;color:var(--muted)}
 .kpi-v{display:block;font-size:24px;font-weight:500;color:var(--berry);letter-spacing:-.5px;margin-top:3px}
 .kpi-s{display:block;font-size:12px;color:var(--muted);margin-top:2px}
-.kpi.blue{background:#eff6fd;border-color:#cfe3f7}
-.kpi.blue .kpi-v{color:#2b6da8}
-.kpi.green{background:#eef9f1;border-color:#c3e9cf}
-.kpi.green .kpi-v{color:var(--ok)}
-.kpi.red{background:#fdeeee;border-color:#f5c6c6}
-.kpi.red .kpi-v{color:var(--danger)}
-
-/* ---------- Аларм (Моргание) ---------- */
-@keyframes alarm-blink {
-  0% { background-color: #fdeeee; border-color: #c62828; box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.4); }
-  50% { background-color: #ffcccc; border-color: #ff0000; box-shadow: 0 0 0 10px rgba(198, 40, 40, 0); }
-  100% { background-color: #fdeeee; border-color: #c62828; box-shadow: 0 0 0 0 rgba(198, 40, 40, 0); }
-}
-.kpi.alarm {
-  animation: alarm-blink 1.2s infinite;
-  border-width: 2px;
-}
-.kpi.alarm .kpi-v { color: #c62828 !important; }
-.alarm-warning {
-  display: none;
-  margin-top: 14px;
-  padding: 14px;
-  background: #fdeeee;
-  border: 2px solid #c62828;
-  color: #c62828;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 15px;
-  text-align: center;
-  animation: alarm-blink 1.2s infinite;
-}
-
-/* ---------- Таблица ---------- */
+.kpi.blue{background:#eff6fd;border-color:#cfe3f7}.kpi.blue .kpi-v{color:#2b6da8}
+.kpi.green{background:#eef9f1;border-color:#c3e9cf}.kpi.green .kpi-v{color:var(--ok)}
+.kpi.red{background:#fdeeee;border-color:#f5c6c6}.kpi.red .kpi-v{color:var(--danger)}
+@keyframes alarm-blink{0%{background-color:#fdeeee;border-color:#c62828;box-shadow:0 0 0 0 rgba(198,40,40,.4)}50%{background-color:#ffcccc;border-color:#f00;box-shadow:0 0 0 10px rgba(198,40,40,0)}100%{background-color:#fdeeee;border-color:#c62828;box-shadow:0 0 0 0 rgba(198,40,40,0)}}
+.kpi.alarm{animation:alarm-blink 1.2s infinite;border-width:2px}.kpi.alarm .kpi-v{color:#c62828 !important}
+.alarm-warning{display:none;margin-top:14px;padding:14px;background:#fdeeee;border:2px solid #c62828;color:#c62828;border-radius:12px;font-weight:600;font-size:15px;text-align:center;animation:alarm-blink 1.2s infinite}
 .bd-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13.5px;border-bottom:1px dashed #f0e3e8}
-.bd-row:last-child{border-bottom:none}
-.bd-name{flex:0 0 165px;color:var(--muted)}
-.bd-bar{flex:1;height:8px;background:#f2eaee;border-radius:6px;overflow:hidden;min-width:40px}
+.bd-name{flex:0 0 165px;color:var(--muted)}.bd-bar{flex:1;height:8px;background:#f2eaee;border-radius:6px;overflow:hidden;min-width:40px}
 .bd-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--berry));border-radius:6px}
-.bd-val{flex:0 0 130px;text-align:right;font-weight:600;color:var(--ink)}
-.bd-pct{flex:0 0 52px;text-align:right;color:var(--muted);font-size:12px}
+.bd-val{flex:0 0 130px;text-align:right;font-weight:600;color:var(--ink)}.bd-pct{flex:0 0 52px;text-align:right;color:var(--muted);font-size:12px}
 .bd-total{display:flex;justify-content:space-between;padding-top:10px;margin-top:8px;border-top:2px solid var(--blue);font-weight:600;font-size:15px;color:var(--berry)}
-
 .retail-info{margin-top:10px;padding:10px 12px;background:#eff6fd;border:1px solid #cfe3f7;border-radius:9px;font-size:12.5px;color:#2b6da8;line-height:1.5}
-.retail-info b{color:#1a4f7d}
-
-details{margin-top:12px}
-details summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--berry);padding:8px 0;user-select:none;list-style:none}
+details{margin-top:12px}details summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--berry);padding:8px 0;user-select:none;list-style:none}
 details summary::-webkit-details-marker{display:none}
-details summary::before{content:'▸ ';display:inline-block;transition:.2s}
-details[open] summary::before{transform:rotate(90deg)}
+details summary::before{content:'▸ ';display:inline-block;transition:.2s}details[open] summary::before{transform:rotate(90deg)}
 .sec-title{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--blue);margin:12px 0 4px;padding-top:8px;border-top:1px solid #f2eaee}
 .sec-title:first-child{border-top:none;margin-top:0;padding-top:0}
 .row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:13px;border-bottom:1px dashed #f5eef1;flex-wrap:wrap}
-.row:last-child{border-bottom:none}
-.row span:first-child{color:var(--muted)}
-.row span:last-child{font-weight:600;text-align:right}
+.row span:first-child{color:var(--muted)}.row span:last-child{font-weight:600;text-align:right}
 .unit-price{font-size:11px;color:#aaa;font-weight:400;margin-left:5px}
-
 .paper-name{font-size:12px;font-weight:600;color:var(--berry);margin:12px 0 6px}
-.paper-rate{font-size:11.5px;color:var(--muted);margin:2px 0 4px;padding:6px 8px;background:#f9f4f6;border-radius:6px;line-height:1.55}
-.paper-rate.base{background:#eaf7ee;color:var(--ok)}
-.paper-rate.up{background:#fff8e6;color:var(--warn)}
-.paper-rate.low{background:#fdeeee;color:var(--danger)}
-.paper-rate b{font-weight:700}
-.settings-foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-
+.hint{background:#fff8e6;border:1px solid #ffe0a3;color:#7a5a00;padding:12px 14px;border-radius:10px;font-size:12.5px;line-height:1.55;margin-top:12px}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,80px);background:#1f1f1f;color:#fff;padding:11px 20px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:.28s;z-index:999;box-shadow:0 8px 26px rgba(0,0,0,.25)}
+#toast.show{opacity:1;transform:translate(-50%,0)}#toast.err{background:var(--danger)}
 .hist-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed #f0e3e8;font-size:13px}
-.hist-item:last-child{border-bottom:none}
-.hist-main{flex:1;min-width:0}
-.hist-main b{color:var(--berry);font-weight:600}
+.hist-main{flex:1;min-width:0}.hist-main b{color:var(--berry);font-weight:600}
 .hist-main small{display:block;color:var(--muted);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hist-price{font-weight:600;color:var(--ok);white-space:nowrap}
 .icon-btn{border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;border-radius:6px;color:var(--muted);transition:.15s}
 .icon-btn:hover{background:var(--berry-light);color:var(--berry)}
 .empty{color:var(--muted);font-size:13px;text-align:center;padding:14px 0}
-
-.hint{background:#fff8e6;border:1px solid #ffe0a3;color:#7a5a00;padding:12px 14px;border-radius:10px;font-size:12.5px;line-height:1.55;margin-top:12px}
-.hint.info{background:#eff6fd;border-color:#cfe3f7;color:#2b6da8}
-
-.save-options{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 12px;background:#f9f4f6;border-radius:9px;margin-top:12px;font-size:13px}
-.save-options .chk{background:#fff;padding:6px 11px;font-size:12.5px}
-
-#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,80px);background:#1f1f1f;color:#fff;
-  padding:11px 20px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:.28s;z-index:999;box-shadow:0 8px 26px rgba(0,0,0,.25)}
-#toast.show{opacity:1;transform:translate(-50%,0)}
-#toast.err{background:var(--danger)}
-
-@media print{
-  body{background:#fff}
-  .topbar,.col-left,.actions,.hist-card,.hint,details,.kpi-grid .kpi.blue,.retail-info,.deal-block,.save-options{display:none!important}
-  .layout{display:block;padding:0;max-width:none}
-  .card{box-shadow:none;border:1px solid #000;page-break-inside:avoid;margin:0 0 10px}
-  .print-only{display:block!important}
-}
-.print-only{display:none}
-@media(max-width:640px){body{font-size:14px}}
+.mode-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;margin-right:4px}
+.mode-badge.off{background:#FCF2F5;color:#8B1C42}.mode-badge.dig{background:#eff6fd;color:#2b6da8}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="brand">Типография · внутренний калькулятор офсета
-    <small>Себестоимость, договорная цена и бенефит менеджера</small>
+  <div class="brand">Типография · внутренний калькулятор<small>Себестоимость, договорная цена и бенефит</small></div>
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="btn-offset" onclick="setMode('offset')">Офсет</button>
+    <button class="mode-tab" id="btn-digital" onclick="setMode('digital')">Цифра</button>
   </div>
   <div class="topbar-right">
-    <label>Сотрудник
-      <select id="employee"></select>
-    </label>
-    <button class="btn" id="renameEmp" title="Переименовать сотрудника">✎</button>
-    <button class="btn" id="folderBtn" title="Выбрать папку для сохранения расчётов">📁 Папка не выбрана</button>
+    <label>Сотрудник <select id="employee"></select></label>
+    <button class="btn" id="renameEmp">✎</button>
+    <button class="btn" id="folderBtn">📁 Папка не выбрана</button>
   </div>
 </div>
 
 <div class="layout">
-
   <div class="col-left">
     <div class="card">
       <h3>Параметры заказа</h3>
-      <div class="grid">
-        <div>
-          <label class="fld">Тип продукции</label>
-          <select id="product">
-            <option value="leaflet" selected>Листовки / Буклеты</option>
-            <option value="brochure">Брошюры (сшивные)</option>
-            <option value="book">Книги / Каталоги</option>
-          </select>
+
+      <!-- ОФСЕТ -->
+      <div id="mode-offset">
+        <div class="grid">
+          <div><label class="fld">Тип продукции</label>
+            <select id="product">
+              <option value="leaflet" selected>Листовки / Буклеты</option>
+              <option value="brochure">Брошюры (сшивные)</option>
+              <option value="book">Книги / Каталоги</option>
+            </select></div>
+          <div><label class="fld">Тираж, шт</label><input type="number" id="qty" value="1000" min="100"></div>
         </div>
-        <div>
-          <label class="fld">Тираж, шт</label>
-          <input type="number" id="qty" value="100" min="100" max="100000">
+
+        <div id="leaflet-options" class="subblock">
+          <h4>Параметры листовок</h4>
+          <div class="grid">
+            <div><label class="fld">Формат</label>
+              <select id="leaflet-format"><option value="A4">А4</option><option value="A5">А5</option><option value="A3" selected>А3</option></select></div>
+            <div><label class="fld">Бумага</label>
+              <select id="leaflet-paper">
+                <option value="80">ВХИ 80</option><option value="120">Мелов. 120</option>
+                <option value="250">Мелов. 250</option><option value="300">Мелов. 300</option>
+              </select></div>
+            <div><label class="fld">Красочность</label>
+              <select id="leaflet-color">
+                <option value="1+0">1+0</option><option value="1+1">1+1</option>
+                <option value="4+0">4+0</option><option value="4+4" selected>4+4</option>
+              </select></div>
+            <div><label class="fld">Ламинация</label>
+              <select id="leaflet-lam">
+                <option value="0" selected>Без ламинации</option>
+                <option value="10">1 сторона</option><option value="20">2 стороны</option>
+              </select></div>
+          </div>
+        </div>
+
+        <div id="brochure-options" class="subblock" style="display:none">
+          <h4>Параметры брошюры</h4>
+          <div class="grid">
+            <div><label class="fld">Формат</label>
+              <select id="brochure-format"><option value="A5" selected>А5</option><option value="A4">А4</option></select></div>
+            <div><label class="fld">Страниц в блоке</label><input type="number" id="brochure-pages" value="16" min="4" step="4"></div>
+          </div>
+          <h4 class="divider">Внутренний блок</h4>
+          <div class="grid">
+            <div><label class="fld">Бумага блока</label>
+              <select id="brochure-paper">
+                <option value="80" selected>ВХИ 80</option><option value="120">Мелов. 120</option>
+                <option value="250">Мелов. 250</option><option value="300">Мелов. 300</option>
+              </select></div>
+            <div><label class="fld">Красочность блока</label>
+              <select id="brochure-color">
+                <option value="1+0">1+0</option><option value="1+1" selected>1+1</option><option value="4+4">4+4</option>
+              </select></div>
+          </div>
+          <h4 class="divider">Обложка, переплет, ламинация</h4>
+          <div class="grid">
+            <div><label class="fld">Бумага обложки</label>
+              <select id="brochure-cover-paper">
+                <option value="120" selected>Мелов. 120</option><option value="250">Мелов. 250</option><option value="300">Мелов. 300</option>
+              </select></div>
+            <div><label class="fld">Красочность обложки</label>
+              <select id="brochure-cover-color"><option value="4+0" selected>4+0</option><option value="4+4">4+4</option></select></div>
+            <div><label class="fld">Ламинация обложки</label>
+              <select id="brochure-cover-lam">
+                <option value="0" selected>Без ламинации</option>
+                <option value="10">1 сторона</option><option value="20">2 стороны</option>
+              </select></div>
+            <div><label class="fld">Переплет</label>
+              <select id="brochure-binding">
+                <option value="saddle" selected>Скрепка (2 скобы)</option>
+                <option value="saddle1">Скрепка (1 скоба)</option>
+                <option value="perfect">Термопереплет (КБС)</option>
+                <option value="soft">Мягкий (КБС / Скоба)</option>
+                <option value="spring">Пружина</option>
+              </select></div>
+          </div>
+        </div>
+
+        <div id="book-options" class="subblock" style="display:none">
+          <h4>Параметры книги</h4>
+          <div class="grid">
+            <div><label class="fld">Формат</label>
+              <select id="book-format"><option value="A5" selected>А5</option><option value="A4">А4</option></select></div>
+            <div><label class="fld">Страниц в блоке</label><input type="number" id="book-pages" value="300" min="8" step="4"></div>
+          </div>
+          <h4 class="divider">Внутренний блок</h4>
+          <div class="grid">
+            <div><label class="fld">Бумага блока</label>
+              <select id="book-paper">
+                <option value="80" selected>ВХИ 80</option><option value="120">Мелов. 120</option>
+                <option value="250">Мелов. 250</option><option value="300">Мелов. 300</option>
+              </select></div>
+            <div><label class="fld">Красочность блока</label>
+              <select id="book-color">
+                <option value="1+0">1+0</option><option value="1+1" selected>1+1</option><option value="4+4">4+4</option>
+              </select></div>
+          </div>
+          <h4 class="divider">Обложка, переплет, ламинация</h4>
+          <div class="grid">
+            <div><label class="fld">Бумага обложки</label>
+              <select id="book-cover-paper">
+                <option value="120">Мелов. 120</option><option value="250" selected>Мелов. 250</option><option value="300">Мелов. 300</option>
+              </select></div>
+            <div><label class="fld">Красочность обложки</label>
+              <select id="book-cover-color"><option value="4+0" selected>4+0</option><option value="4+4">4+4</option></select></div>
+            <div><label class="fld">Ламинация обложки</label>
+              <select id="book-cover-lam">
+                <option value="0">Без ламинации</option><option value="10" selected>1 сторона</option><option value="20">2 стороны</option>
+              </select></div>
+            <div><label class="fld">Переплет</label>
+              <select id="book-binding">
+                <option value="soft" selected>Мягкий</option>
+                <option value="perfect">Термопереплет (КБС)</option>
+                <option value="hard">Твердый переплет</option>
+                <option value="integral">Интегральный</option>
+                <option value="spring">Пружина</option>
+              </select></div>
+          </div>
+        </div>
+
+        <div class="chks">
+          <label class="chk"><input type="checkbox" id="selfTurn"> Само на себя</label>
+          <label class="chk"><input type="checkbox" id="cut" checked> Резка</label>
+          <label class="chk"><input type="checkbox" id="crease"> Биговка</label>
+          <label class="chk"><input type="checkbox" id="fold"> Фальцовка</label>
         </div>
       </div>
 
-      <!-- ЛИСТОВКИ -->
-      <div id="leaflet-options" class="subblock" style="display:none">
-        <h4>Параметры листовок</h4>
+      <!-- ЦИФРА -->
+      <div id="mode-digital" style="display:none">
         <div class="grid">
-          <div>
-            <label class="fld">Формат изделия</label>
-            <select id="leaflet-format">
-              <option value="A4">А4 (210×297)</option>
-              <option value="A5">А5 (148×210)</option>
-              <option value="A3" selected>А3 (297×420)</option>
-            </select>
-          </div>
-          <div>
-            <label class="fld">Бумага</label>
-            <select id="leaflet-paper">
-              <option value="80">ВХИ 80 г/м²</option>
-              <option value="120">Мелованная 120 г/м²</option>
-              <option value="250">Мелованная 250 г/м²</option>
-              <option value="300">Мелованная 300 г/м²</option>
-            </select>
-          </div>
-          <div>
-            <label class="fld">Красочность</label>
-            <select id="leaflet-color">
-              <option value="1+0">1+0 (ч/б)</option>
-              <option value="1+1">1+1 (ч/б двусторонняя)</option>
-              <option value="4+0">4+0 (цветная)</option>
-              <option value="4+4" selected>4+4 (цветная двусторонняя)</option>
-            </select>
-          </div>
+          <div><label class="fld">Тип продукции</label>
+            <select id="d-product">
+              <option value="leaflet" selected>Листовки / Буклеты</option>
+              <option value="brochure">Брошюры</option>
+              <option value="book">Книги / Каталоги</option>
+            </select></div>
+          <div><label class="fld">Тираж, шт</label><input type="number" id="d-qty" value="100" min="1"></div>
         </div>
-      </div>
 
-      <!-- БРОШЮРЫ -->
-      <div id="brochure-options" class="subblock">
-        <h4>Параметры брошюры</h4>
-        <div class="grid">
-          <div>
-            <label class="fld">Формат брошюры</label>
-            <select id="brochure-format">
-              <option value="A5" selected>А5 (145×205)</option>
-              <option value="A4">А4 (205×290)</option>
-            </select>
-          </div>
-          <div>
-            <label class="fld">Кол-во страниц в блоке</label>
-            <input type="number" id="brochure-pages" value="8" min="4" step="4">
-          </div>
-        </div>
-        <h4 class="divider">Внутренний блок</h4>
-        <div class="grid">
-          <div>
-            <label class="fld">Бумага блока</label>
-            <select id="brochure-paper">
-              <option value="80" selected>ВХИ 80 г/м²</option>
-              <option value="120">Мелованная 120 г/м²</option>
-              <option value="250">Мелованная 250 г/м²</option>
-              <option value="300">Мелованная 300 г/м²</option>
-            </select>
-          </div>
-          <div>
-            <label class="fld">Красочность блока</label>
-            <select id="brochure-color">
-              <option value="1+0">1+0 (ч/б)</option>
-              <option value="1+1" selected>1+1 (ч/б двусторонняя)</option>
-              <option value="4+4">4+4 (цветная)</option>
-            </select>
+        <div id="d-leaflet-options" class="subblock">
+          <h4>Параметры листовок</h4>
+          <div class="grid">
+            <div><label class="fld">Формат</label>
+              <select id="d-leaflet-format"><option value="A6">А6</option><option value="A5">А5</option><option value="A4" selected>А4</option><option value="A3">А3</option></select></div>
+            <div><label class="fld">Бумага</label>
+              <select id="d-leaflet-paper">
+                <option value="80" selected>ВХИ 80</option><option value="90">90</option><option value="100">100</option><option value="120">120</option>
+                <option value="160">160</option><option value="200">200</option><option value="250">250</option><option value="300">300</option>
+                <option value="self_gloss">Самоклейка глян.</option><option value="self_matte">Самоклейка мат.</option>
+              </select></div>
+            <div><label class="fld">Красочность</label>
+              <select id="d-leaflet-color"><option value="1+0">1+0</option><option value="1+1">1+1</option><option value="4+0">4+0</option><option value="4+4" selected>4+4</option></select></div>
+            <div><label class="fld">Ламинация</label>
+              <select id="d-leaflet-lam">
+                <option value="0" selected>Без ламинации</option>
+                <option value="lam1">1 сторона</option><option value="lam2">2 стороны</option>
+              </select></div>
           </div>
         </div>
-        <h4 class="divider">Обложка и переплет</h4>
-        <div class="grid">
-          <div>
-            <label class="fld">Бумага обложки</label>
-            <select id="brochure-cover-paper">
-              <option value="120" selected>Мелованная 120 г/м²</option>
-              <option value="250">Мелованная 250 г/м²</option>
-              <option value="300">Мелованная 300 г/м²</option>
-            </select>
-          </div>
-          <div>
-            <label class="fld">Красочность обложки</label>
-            <select id="brochure-cover-color">
-              <option value="4+0" selected>4+0 (цветная 1 сторона)</option>
-              <option value="4+4">4+4 (цветная 2 стороны)</option>
-            </select>
-          </div>
-          <div>
-            <label class="fld">Переплет</label>
-            <select id="brochure-binding">
-              <option value="saddle" selected>Скрепка (2 скобы)</option>
-              <option value="perfect">Термопереплет (КБС)</option>
-            </select>
-          </div>
-        </div>
-      </div>
 
-      <!-- КНИГИ -->
-      <div id="book-options" class="subblock" style="display:none">
-        <h4>Параметры книги</h4>
-        <div class="grid">
-          <div>
-            <label class="fld">Формат книги</label>
-            <select id="book-format">
-              <option value="A5" selected>А5 (145×205)</option>
-              <option value="A4">А4 (205×290)</option>
-            </select>
+        <div id="d-brochure-options" class="subblock" style="display:none">
+          <h4>Параметры брошюры</h4>
+          <div class="grid">
+            <div><label class="fld">Формат</label>
+              <select id="d-brochure-format"><option value="A5" selected>А5</option><option value="A4">А4</option></select></div>
+            <div><label class="fld">Страниц</label><input type="number" id="d-brochure-pages" value="8" min="4" step="4"></div>
           </div>
-          <div>
-            <label class="fld">Кол-во страниц в блоке</label>
-            <input type="number" id="book-pages" value="300" min="8" step="4">
+          <h4 class="divider">Блок</h4>
+          <div class="grid">
+            <div><label class="fld">Бумага блока</label>
+              <select id="d-brochure-paper">
+                <option value="80" selected>ВХИ 80</option><option value="90">90</option><option value="100">100</option>
+                <option value="120">120</option><option value="160">160</option><option value="200">200</option>
+              </select></div>
+            <div><label class="fld">Красочность блока</label>
+              <select id="d-brochure-color"><option value="1+0">1+0</option><option value="1+1">1+1</option><option value="4+0">4+0</option><option value="4+4" selected>4+4</option></select></div>
           </div>
-        </div>
-        <h4 class="divider">Внутренний блок</h4>
-        <div class="grid">
-          <div>
-            <label class="fld">Бумага блока</label>
-            <select id="book-paper">
-              <option value="80" selected>ВХИ 80 г/м²</option>
-              <option value="120">Мелованная 120 г/м²</option>
-              <option value="250">Мелованная 250 г/м²</option>
-              <option value="300">Мелованная 300 г/м²</option>
-            </select>
-          </div>
-          <div>
-            <label class="fld">Красочность блока</label>
-            <select id="book-color">
-              <option value="1+0">1+0 (ч/б)</option>
-              <option value="1+1" selected>1+1 (ч/б двусторонняя)</option>
-              <option value="4+4">4+4 (цветная)</option>
-            </select>
-          </div>
-        </div>
-        <h4 class="divider">Обложка</h4>
-        <div class="grid">
-          <div>
-            <label class="fld">Бумага обложки</label>
-            <select id="book-cover-paper">
-              <option value="120">Мелованная 120 г/м²</option>
-              <option value="250" selected>Мелованная 250 г/м²</option>
-              <option value="300">Мелованная 300 г/м²</option>
-            </select>
-          </div>
-          <div>
-            <label class="fld">Красочность обложки</label>
-            <select id="book-cover-color">
-              <option value="4+0" selected>4+0 (цветная 1 сторона)</option>
-              <option value="4+4">4+4 (цветная 2 стороны)</option>
-            </select>
-          </div>
-          <div>
-            <label class="fld">Ламинация обложки</label>
-            <select id="book-cover-lam">
-              <option value="0">Без ламинации</option>
-              <option value="10" selected>1 сторона</option>
-              <option value="20">2 стороны</option>
-            </select>
-          </div>
-          <div>
-            <label class="fld">Переплет</label>
-            <select id="book-binding">
-              <option value="soft" selected>Мягкий (КБС / Скоба)</option>
-              <option value="hard">Твердый переплет</option>
-            </select>
+          <h4 class="divider">Обложка, переплет, ламинация</h4>
+          <div class="grid">
+            <div><label class="fld">Бумага обложки</label>
+              <select id="d-brochure-cover-paper">
+                <option value="120">120</option><option value="160">160</option><option value="200">200</option>
+                <option value="250">250</option><option value="300" selected>300</option>
+              </select></div>
+            <div><label class="fld">Красочность обложки</label>
+              <select id="d-brochure-cover-color"><option value="4+0" selected>4+0</option><option value="4+4">4+4</option></select></div>
+            <div><label class="fld">Ламинация обложки</label>
+              <select id="d-brochure-cover-lam">
+                <option value="0" selected>Без ламинации</option>
+                <option value="lam1">1 сторона</option><option value="lam2">2 стороны</option>
+              </select></div>
+            <div><label class="fld">Переплет</label>
+              <select id="d-brochure-binding">
+                <option value="saddle1">Скрепка (1)</option>
+                <option value="saddle2" selected>Скрепка (2)</option>
+                <option value="perfect">Термопереплет</option>
+                <option value="spring">Пружина</option>
+              </select></div>
           </div>
         </div>
-      </div>
 
-      <div class="chks">
-        <label class="chk"><input type="checkbox" id="selfTurn"> Схема «Само на себя» (скидка на формы)</label>
-        <label class="chk"><input type="checkbox" id="cut" checked> Резка</label>
-        <label class="chk"><input type="checkbox" id="crease"> Биговка / Фальцовка</label>
+        <div id="d-book-options" class="subblock" style="display:none">
+          <h4>Параметры книги</h4>
+          <div class="grid">
+            <div><label class="fld">Формат</label>
+              <select id="d-book-format"><option value="A5" selected>А5</option><option value="A4">А4</option></select></div>
+            <div><label class="fld">Страниц</label><input type="number" id="d-book-pages" value="100" min="8" step="4"></div>
+          </div>
+          <h4 class="divider">Блок</h4>
+          <div class="grid">
+            <div><label class="fld">Бумага блока</label>
+              <select id="d-book-paper">
+                <option value="80" selected>ВХИ 80</option><option value="90">90</option><option value="100">100</option><option value="120">120</option><option value="160">160</option>
+              </select></div>
+            <div><label class="fld">Красочность блока</label>
+              <select id="d-book-color"><option value="1+0">1+0</option><option value="1+1">1+1</option><option value="4+0">4+0</option><option value="4+4" selected>4+4</option></select></div>
+          </div>
+          <h4 class="divider">Обложка, переплет, ламинация</h4>
+          <div class="grid">
+            <div><label class="fld">Бумага обложки</label>
+              <select id="d-book-cover-paper">
+                <option value="120">120</option><option value="160">160</option><option value="200">200</option>
+                <option value="250">250</option><option value="300" selected>300</option>
+              </select></div>
+            <div><label class="fld">Красочность обложки</label>
+              <select id="d-book-cover-color"><option value="4+0" selected>4+0</option><option value="4+4">4+4</option></select></div>
+            <div><label class="fld">Ламинация обложки</label>
+              <select id="d-book-cover-lam">
+                <option value="0">Нет</option><option value="lam1" selected>1 сторона</option><option value="lam2">2 стороны</option>
+              </select></div>
+            <div><label class="fld">Переплет</label>
+              <select id="d-book-binding">
+                <option value="perfect" selected>Термопереплет</option>
+                <option value="spring">Пружина</option>
+                <option value="hard">Твердый</option>
+              </select></div>
+          </div>
+        </div>
+
+        <div class="chks">
+          <label class="chk"><input type="checkbox" id="d-cut" checked> Резка</label>
+          <label class="chk"><input type="checkbox" id="d-crease"> Биговка</label>
+          <label class="chk"><input type="checkbox" id="d-fold"> Фальцовка</label>
+        </div>
       </div>
     </div>
 
     <div class="card">
       <h3>Данные заказа</h3>
       <div class="grid">
-        <div>
-          <label class="fld">Клиент / название заказа</label>
-          <input type="text" id="clientName" placeholder="Например: Храм Св. Татианы — буклет">
-        </div>
-        <div>
-          <label class="fld">Комментарий</label>
-          <input type="text" id="note" placeholder="Спуск, нюансы, договорённости">
-        </div>
+        <div><label class="fld">Клиент / заказ</label><input type="text" id="clientName" placeholder="Храм Св. Татианы — буклет"></div>
+        <div><label class="fld">Комментарий</label><input type="text" id="note" placeholder="Спуск, нюансы"></div>
       </div>
     </div>
 
     <div class="card">
-      <h3>Глобальные настройки <span class="badge">общие для этого компьютера</span></h3>
+      <h3>Глобальные настройки <span class="badge">на этом компьютере</span></h3>
       <details id="settingsBlock">
-        <summary>Открыть тарифы (бумага, печать, формы, переплёт)</summary>
+        <summary>Открыть тарифы</summary>
         <div id="settingsBody" style="margin-top:10px"></div>
-        <div class="settings-foot">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
           <button class="btn" id="resetCfg">↺ Сбросить к значениям по умолчанию</button>
         </div>
       </details>
@@ -407,114 +375,55 @@ details[open] summary::before{transform:rotate(90deg)}
     <div class="card" id="printArea">
       <h3>Расчёт <span class="badge" id="calcBadge">—</span></h3>
 
-      <div class="print-only" style="margin-bottom:14px;border-bottom:2px solid #000;padding-bottom:8px">
-        <div style="font-size:18px;font-weight:600" id="printTitle">Смета офсетной печати</div>
-        <div style="font-size:13px" id="printSub"></div>
-      </div>
-
-      <!-- ЛЕВАЯ КОЛОНКА: Затраты компании -->
       <div class="kpi-grid">
-        <div class="kpi">
-          <span class="kpi-l">Себестоимость (затраты)</span>
-          <span class="kpi-v" id="kCost">—</span>
-          <span class="kpi-s" id="kCostUnit">—</span>
-        </div>
-        <div class="kpi red" id="minPriceBlock">
-          <span class="kpi-l">Минимальная цена (порог <span id="lblMinMargin">10</span>%)</span>
-          <span class="kpi-v" id="kMin">—</span>
-          <span class="kpi-s" id="kMinUnit">—</span>
-        </div>
+        <div class="kpi"><span class="kpi-l">Себестоимость</span><span class="kpi-v" id="kCost">—</span><span class="kpi-s" id="kCostUnit">—</span></div>
+        <div class="kpi red" id="minPriceBlock"><span class="kpi-l">Минимальная цена (маржа <span id="lblMinMargin">10</span>%)</span><span class="kpi-v" id="kMin">—</span><span class="kpi-s" id="kMinUnit">—</span></div>
       </div>
 
-      <!-- ПРАВАЯ КОЛОНКА: Рыночные ориентиры -->
       <div class="kpi-grid" style="margin-top:10px">
-        <div class="kpi blue">
-          <span class="kpi-l">Рыночный прайс (наценка <span id="lblMarkup">41</span>%)</span>
-          <span class="kpi-v" id="kMarket">—</span>
-          <span class="kpi-s" id="kMarketUnit">—</span>
-        </div>
-        <div class="kpi blue">
-          <span class="kpi-l">Рыночный прайс + Бенефит</span>
-          <span class="kpi-v" id="kMarketPlusBenefit">—</span>
-          <span class="kpi-s" id="kMarketPlusBenefitUnit">—</span>
-        </div>
+        <div class="kpi blue"><span class="kpi-l" id="lblMarketTitle">Рыночный прайс (наценка <span id="lblMarkup">41</span>%)</span><span class="kpi-v" id="kMarket">—</span><span class="kpi-s" id="kMarketUnit">—</span></div>
+        <div class="kpi blue"><span class="kpi-l">Рыночный прайс + бенефит</span><span class="kpi-v" id="kMarketPlusBenefit">—</span><span class="kpi-s" id="kMarketPlusBenefitUnit">—</span></div>
       </div>
 
-      <!-- БЛОК СДЕЛКИ (Ввод менеджера) -->
       <div class="deal-block">
         <h4>🤝 Сделка с клиентом</h4>
         <div class="grid">
-          <div>
-            <label class="fld">Договорная цена, ₽</label>
-            <input type="number" id="contractPrice" value="24217" step="100" min="0">
-          </div>
-          <div>
-            <label class="fld">Бенефит менеджера, ₽</label>
-            <input type="number" id="managerBenefit" value="0" step="100" min="0">
-          </div>
+          <div><label class="fld">Договорная цена, ₽</label><input type="number" id="contractPrice" value="0" step="100" min="0"></div>
+          <div><label class="fld">Бенефит менеджера, ₽</label><input type="number" id="managerBenefit" value="0" step="100" min="0"></div>
         </div>
       </div>
 
-      <!-- РЕЗУЛЬТАТЫ ДЛЯ ТИПОГРАФИИ -->
       <div class="kpi-grid" style="margin-top:14px">
-        <div class="kpi green" id="typographyRevenueBlock">
-          <span class="kpi-l">Типография получает</span>
-          <span class="kpi-v" id="typographyRevenue">—</span>
-          <span class="kpi-s" id="typographyRevenueUnit">—</span>
-        </div>
-        <div class="kpi green" id="typographyProfitBlock">
-          <span class="kpi-l">Прибыль типографии</span>
-          <span class="kpi-v" id="typographyProfit">—</span>
-          <span class="kpi-s" id="typographyMargin">—</span>
-        </div>
+        <div class="kpi green" id="typographyRevenueBlock"><span class="kpi-l">Типография получает</span><span class="kpi-v" id="typographyRevenue">—</span><span class="kpi-s" id="typographyRevenueUnit">—</span></div>
+        <div class="kpi green" id="typographyProfitBlock"><span class="kpi-l">Прибыль типографии</span><span class="kpi-v" id="typographyProfit">—</span><span class="kpi-s" id="typographyMargin">—</span></div>
       </div>
 
-      <div id="alarmWarning" class="alarm-warning">
-        ⚠️ АЛАРМ! Типография недополучает <b id="alarmShortage">0</b> ₽ до минимальной цены <b id="alarmMinPrice">0</b> ₽.
-      </div>
+      <div id="alarmWarning" class="alarm-warning">⚠️ АЛАРМ! Типография недополучает <b id="alarmShortage">0</b> ₽ до минимальной цены <b id="alarmMinPrice">0</b> ₽.</div>
 
       <div class="grid three" style="margin-top:14px">
-        <div>
-          <label class="fld">Наценка (рыночный прайс), %</label>
-          <input type="number" id="markup" value="41" step="1" min="0" max="500">
-        </div>
-        <div>
-          <label class="fld">Мин. маржа типографии, %</label>
-          <input type="number" id="minMargin" value="10" step="1" min="0" max="200">
-        </div>
+        <div id="markupWrap"><label class="fld">Наценка, %</label><input type="number" id="markup" value="41" step="1" min="0" max="500"></div>
+        <div><label class="fld">Мин. маржа, %</label><input type="number" id="minMargin" value="10" step="1" min="0" max="200"></div>
       </div>
 
       <div style="margin-top:16px">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--blue);margin-bottom:8px">Структура себестоимости</div>
+        <div class="sec-title">Структура себестоимости</div>
         <div id="breakdown"></div>
         <div class="bd-total"><span>Итого себестоимость</span><span id="bdTotal">—</span></div>
       </div>
 
       <div class="retail-info" id="retailInfo" style="display:none"></div>
 
-      <details id="detailBlock">
-        <summary>Полная детализация расчёта</summary>
-        <div id="rows"></div>
-      </details>
+      <details id="detailBlock"><summary>Полная детализация</summary><div id="rows"></div></details>
 
-      <!-- ВЫБОР ФОРМАТОВ СОХРАНЕНИЯ -->
-      <div class="save-options">
-        <span style="color:var(--muted);font-weight:500">При сохранении:</span>
-        <label class="chk on"><input type="checkbox" id="saveHtml" checked> 📄 HTML-смета</label>
-        <label class="chk on"><input type="checkbox" id="saveJson" checked> 🗄 JSON</label>
-        <label class="chk on"><input type="checkbox" id="saveCsv" checked> 📊 Журнал CSV</label>
-      </div>
-
-      <div class="actions" style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
-        <button class="btn primary" id="saveBtn" style="flex:1;padding:12px">💾 Сохранить расчёт</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <button class="btn primary" id="saveBtn" style="flex:1;padding:12px">💾 Сохранить</button>
         <button class="btn" id="printBtn" style="flex:1;padding:12px">🖨 Печать / PDF</button>
         <button class="btn" id="copyBtn" style="flex:1;padding:12px">📋 Скопировать</button>
       </div>
-
     </div>
 
     <div class="card hist-card">
-      <h3>История расчётов <span class="badge" id="histCount">0</span></h3>
+      <h3>История <span class="badge" id="histCount">0</span></h3>
       <div id="history"><div class="empty">Пока пусто</div></div>
     </div>
   </div>
@@ -531,106 +440,105 @@ const pad = n => String(n).padStart(2,'0');
 const escHtml = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
 function toast(msg, isErr){
-  const t = el('toast');
-  t.textContent = msg;
-  t.classList.toggle('err', !!isErr);
-  t.classList.add('show');
-  clearTimeout(t._h);
-  t._h = setTimeout(()=>t.classList.remove('show'), 3200);
-}
-
-function idbOpen(){
-  return new Promise((res,rej)=>{
-    const r = indexedDB.open('offset_calc_db', 1);
-    r.onupgradeneeded = () => { if(!r.result.objectStoreNames.contains('kv')) r.result.createObjectStore('kv'); };
-    r.onsuccess = () => res(r.result);
-    r.onerror = () => rej(r.error);
-  });
-}
-async function kvSet(k,v){
-  const db = await idbOpen();
-  return new Promise((res,rej)=>{
-    const tx = db.transaction('kv','readwrite');
-    tx.objectStore('kv').put(v,k);
-    tx.oncomplete = () => res();
-    tx.onerror = () => rej(tx.error);
-  });
-}
-async function kvGet(k){
-  const db = await idbOpen();
-  return new Promise((res,rej)=>{
-    const tx = db.transaction('kv','readonly');
-    const rq = tx.objectStore('kv').get(k);
-    rq.onsuccess = () => res(rq.result);
-    rq.onerror = () => rej(rq.error);
-  });
+  const t = el('toast'); t.textContent = msg; t.classList.toggle('err', !!isErr); t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 3200);
 }
 
 const DEFAULT_CFG = {
-  platePrice: 500,
-  wastePerForm: 50,
-  printPrices: {'1+0':2, '1+1':4, '4+0':8, '4+4':16},
+  platePrice: 500, wastePerForm: 50,
+  printPrices: {'1+0':2,'1+1':4,'4+0':8,'4+4':16},
   paper: {
-    '80':  { name:'ВХИ 80 г/м²',          packSize:1000, packCost:1890, packPrice:3250 },
-    '120': { name:'Мелованная 120 г/м²',  packSize:500,  packCost:1600, packPrice:3000 },
-    '250': { name:'Мелованная 250 г/м²',  packSize:300,  packCost:1700, packPrice:3300 },
-    '300': { name:'Мелованная 300 г/м²',  packSize:250,  packCost:1600, packPrice:3000 }
+    '80':  { name:'ВХИ 80 г/м²', packSize:1000, packCost:1890, packPrice:3250 },
+    '120': { name:'Мелованная 120 г/м²', packSize:500, packCost:1600, packPrice:3000 },
+    '250': { name:'Мелованная 250 г/м²', packSize:300, packCost:1700, packPrice:3300 },
+    '300': { name:'Мелованная 300 г/м²', packSize:250, packCost:1600, packPrice:3000 }
   },
   cut: 1.0,
   crease: 2.5,
-  itemsPerA2:  { A5:8, A4:4, A3:2 },
-  pagesPerA2:  { A5:16, A4:8 },
+  fold: 1.5,
+  lam: { lam1: 10, lam2: 20 },
+  itemsPerA2: { A5:8, A4:4, A3:2 },
+  pagesPerA2: { A5:16, A4:8 },
   coversPerA2: { A5:8, A4:4 },
-  binding: { saddle:8, perfect:30, soft:30, hard:120 }
+  binding: { saddle:8, saddle1:6, saddle2:8, perfect:30, soft:30, hard:120, integral:70, spring:25 },
+
+  digital: {
+    bulkThreshold: 50,
+    printPrices: {
+      '1+0': {base:20, bulk:20},
+      '1+1': {base:20, bulk:20},
+      '4+0': {base:25, bulk:20},
+      '4+4': {base:50, bulk:40}
+    },
+    printCosts: { '1+0':10, '1+1':10, '4+0':12, '4+4':22 },
+    paper: {
+      '80':         { name:'ВХИ 80',          cost:1.00, base:9,  bulk:5  },
+      '90':         { name:'90 г/м²',         cost:1.20, base:12, bulk:8  },
+      '100':        { name:'100 г/м²',        cost:1.30, base:12, bulk:8  },
+      '120':        { name:'120 г/м²',        cost:1.60, base:17, bulk:13 },
+      '160':        { name:'160 г/м²',        cost:2.20, base:23, bulk:20 },
+      '200':        { name:'200 г/м²',        cost:2.80, base:25, bulk:22 },
+      '250':        { name:'250 г/м²',        cost:3.50, base:27, bulk:23 },
+      '300':        { name:'300 г/м²',        cost:4.20, base:30, bulk:25 },
+      'self_gloss': { name:'Самоклейка глян.',cost:15,   base:50, bulk:45 },
+      'self_matte': { name:'Самоклейка мат.', cost:15,   base:50, bulk:45 }
+    },
+    postpress: {
+      cut:     { cost:0.30, price:0.72 },
+      crease:  { cost:3,    price:10   },
+      fold:    { cost:2,    price:5    },
+      lam1:    { cost:4,    price:10   },
+      lam2:    { cost:8,    price:20   },
+      saddle1: { cost:3,    price:6    },
+      saddle2: { cost:4,    price:8    },
+      perfect: { cost:9,    price:15   },
+      spring:  { cost:25,   price:55   },
+      hard:    { cost:120,  price:200  }
+    },
+    itemsPerA3: { A6:8, A5:4, A4:2, A3:1 },
+    pagesPerA3: { A5:8, A4:4 },
+    coversPerA3: { A5:2, A4:1 }
+  }
 };
 
-const BINDING_NAMES = { saddle:'Скрепка (2 скобы)', perfect:'Термопереплет (КБС)', soft:'Мягкий (КБС/Скоба)', hard:'Твердый переплет' };
-const BREAKDOWN_LABELS = { paper:'Бумага', plates:'Печатные формы', print:'Печать (работа)', binding:'Переплет', postpress:'Послепечать' };
-const CFG_KEY = 'offset_calc_cfg_v2';
+const BINDING_NAMES = { saddle:'Скрепка (2)', saddle1:'Скрепка (1)', saddle2:'Скрепка (2)', perfect:'Термопереплет', soft:'Мягкий', hard:'Твердый', integral:'Интегральный', spring:'Пружина' };
+const BREAKDOWN_LABELS = { paper:'Бумага', plates:'Формы', print:'Печать', binding:'Переплет', postpress:'Послепечать' };
+const CFG_KEY = 'calc_cfg_v4';
 
 function deepMerge(a,b){
   for(const k in b){
-    if(b[k] && typeof b[k]==='object' && !Array.isArray(b[k]) && a[k] && typeof a[k]==='object'){
-      deepMerge(a[k], b[k]);
-    }else if(b[k] !== undefined){
-      a[k] = b[k];
-    }
+    if(b[k] && typeof b[k]==='object' && !Array.isArray(b[k]) && a[k] && typeof a[k]==='object') deepMerge(a[k], b[k]);
+    else if(b[k] !== undefined) a[k] = b[k];
   }
 }
 function loadCfg(){
   const base = JSON.parse(JSON.stringify(DEFAULT_CFG));
-  try{
-    const saved = JSON.parse(localStorage.getItem(CFG_KEY) || 'null');
-    if(saved && typeof saved === 'object') deepMerge(base, saved);
-  }catch(e){}
+  try{ const saved = JSON.parse(localStorage.getItem(CFG_KEY) || 'null'); if(saved) deepMerge(base, saved); }catch(e){}
   return base;
 }
 function saveCfg(){ localStorage.setItem(CFG_KEY, JSON.stringify(CFG)); }
 let CFG = loadCfg();
 
-function getByPath(obj, path){ return path.split('.').reduce((o,k)=> (o==null ? o : o[k]), obj); }
-function setByPath(obj, path, val){
-  const parts = path.split('.');
-  let o = obj;
-  for(let i=0;i<parts.length-1;i++) o = o[parts[i]];
-  o[parts[parts.length-1]] = val;
+let currentMode = 'offset';
+function setMode(mode){
+  currentMode = mode;
+  el('mode-offset').style.display = mode === 'offset' ? 'block' : 'none';
+  el('mode-digital').style.display = mode === 'digital' ? 'block' : 'none';
+  el('btn-offset').classList.toggle('active', mode === 'offset');
+  el('btn-digital').classList.toggle('active', mode === 'digital');
+  el('markupWrap').style.display = mode === 'offset' ? 'block' : 'none';
+  el('lblMarketTitle').innerHTML = mode === 'offset'
+    ? 'Рыночный прайс (наценка <span id="lblMarkup">41</span>%)'
+    : 'Прайс по прайс-листу';
+  renderSettings();
+  updateUI();
 }
 
-function updatePaperRates(){
-  document.querySelectorAll('[data-rate]').forEach(d=>{
-    const k = d.dataset.rate;
-    const p = CFG.paper[k];
-    if(!p) return;
-    const costRate   = p.packSize ? p.packCost  / p.packSize : 0;
-    const retailRate = p.packSize ? p.packPrice / p.packSize : 0;
-    const markupPct  = p.packCost > 0 ? (p.packPrice / p.packCost - 1) * 100 : 0;
-    let cls = 'paper-rate';
-    if(markupPct >= 40) cls += ' base';
-    else if(markupPct >= 15) cls += ' up';
-    else cls += ' low';
-    d.className = cls;
-    d.innerHTML = `себест. <b>${fmt2(costRate)} ₽/л</b> · клиент <b>${fmt2(retailRate)} ₽/л</b> · наценка <b>${fmt2(markupPct)}%</b>`;
-  });
+function getByPath(obj, path){ return path.split('.').reduce((o,k)=> (o==null ? o : o[k]), obj); }
+function setByPath(obj, path, val){
+  const parts = path.split('.'); let o = obj;
+  for(let i=0;i<parts.length-1;i++) o = o[parts[i]];
+  o[parts[parts.length-1]] = val;
 }
 
 function platesPerSheet(color, selfTurn){
@@ -641,139 +549,295 @@ function platesPerSheet(color, selfTurn){
   return front + (selfTurn ? 0 : back);
 }
 
-function compute(){
+function computeOffset(){
   const product = el('product').value;
   const qty = Math.max(1, Math.round(num(el('qty').value,1)));
   const isSelfTurn = el('selfTurn').checked;
   const isCut = el('cut').checked;
   const isCrease = el('crease').checked;
+  const isFold = el('fold').checked;
   const rows = [];
   const cost = { paper:0, plates:0, print:0, binding:0, postpress:0 };
   const push = (section,label,value,detail='') => rows.push({section,label,value,detail});
-  let summary = '';
-  let retailPaper = 0;
+  let summary = '', retailPaper = 0;
 
   if(product === 'book' || product === 'brochure'){
     const isBook = product === 'book';
-    const format   = el(isBook?'book-format':'brochure-format').value;
-    const pages    = Math.max(4, Math.round(num(el(isBook?'book-pages':'brochure-pages').value,4)/4)*4);
-    const pBlock   = el(isBook?'book-paper':'brochure-paper').value;
-    const cBlock   = el(isBook?'book-color':'brochure-color').value;
-    const pCover   = el(isBook?'book-cover-paper':'brochure-cover-paper').value;
-    const cCover   = el(isBook?'book-cover-color':'brochure-cover-color').value;
-    const binding  = el(isBook?'book-binding':'brochure-binding').value;
-    const lamCover = isBook ? parseInt(el('book-cover-lam').value,10) : 0;
+    const format = el(isBook?'book-format':'brochure-format').value;
+    const pages = Math.max(4, Math.round(num(el(isBook?'book-pages':'brochure-pages').value,4)/4)*4);
+    const pBlock = el(isBook?'book-paper':'brochure-paper').value;
+    const cBlock = el(isBook?'book-color':'brochure-color').value;
+    const pCover = el(isBook?'book-cover-paper':'brochure-cover-paper').value;
+    const cCover = el(isBook?'book-cover-color':'brochure-cover-color').value;
+    const binding = el(isBook?'book-binding':'brochure-binding').value;
+    const lamKey = isBook ? el('book-cover-lam').value : el('brochure-cover-lam').value;
     summary = `${isBook?'Книга':'Брошюра'} · ${format} · ${pages} стр. · ${qty} экз.`;
 
-    const pagesPerSheet   = CFG.pagesPerA2[format];
-    const sheetsPerCopy   = Math.ceil(pages / pagesPerSheet);
-    const cleanBlockSheets= sheetsPerCopy * qty;
-    const platesBlock     = sheetsPerCopy * platesPerSheet(cBlock, isSelfTurn);
-    const wasteBlockSheets= platesBlock * CFG.wastePerForm;
-    const totalBlockSheets= cleanBlockSheets + wasteBlockSheets;
-    const pb          = CFG.paper[pBlock];
-    const packsBlock  = Math.ceil(totalBlockSheets / pb.packSize);
+    const pagesPerSheet = CFG.pagesPerA2[format];
+    const sheetsPerCopy = Math.ceil(pages / pagesPerSheet);
+    const cleanBlockSheets = sheetsPerCopy * qty;
+    const platesBlock = sheetsPerCopy * platesPerSheet(cBlock, isSelfTurn);
+    const wasteBlockSheets = platesBlock * CFG.wastePerForm;
+    const totalBlockSheets = cleanBlockSheets + wasteBlockSheets;
+    const pb = CFG.paper[pBlock];
+    const packsBlock = Math.ceil(totalBlockSheets / pb.packSize);
     const printCostBlock = cleanBlockSheets * CFG.printPrices[cBlock];
     const paperCostBlock = packsBlock * pb.packCost;
-    const platesCostBlock= platesBlock * CFG.platePrice;
+    const platesCostBlock = platesBlock * CFG.platePrice;
     retailPaper += packsBlock * pb.packPrice;
 
-    push('Блок','Листов А2 на блок (чистых)', fmt(cleanBlockSheets)+' шт', `${sheetsPerCopy} л. × ${fmt(qty)} экз.`);
-    push('Блок','Бумага на приладку', fmt(wasteBlockSheets)+' шт', `${platesBlock} форм × ${CFG.wastePerForm} л.`);
-    push('Блок','Печать блока', fmt(printCostBlock)+' ₽', `${fmt(cleanBlockSheets)} отт. × ${CFG.printPrices[cBlock]} ₽`);
-    push('Блок','Бумага блока', fmt(paperCostBlock)+' ₽', `${packsBlock} пач. × ${fmt(pb.packCost)} ₽ (${pb.name})`);
-    push('Блок','Формы блока', fmt(platesCostBlock)+' ₽', `${platesBlock} шт × ${CFG.platePrice} ₽`);
+    push('Блок','Листов А2', fmt(cleanBlockSheets)+' шт', `${sheetsPerCopy} × ${fmt(qty)}`);
+    push('Блок','Приладка', fmt(wasteBlockSheets)+' шт');
+    push('Блок','Печать', fmt(printCostBlock)+' ₽', `${fmt(cleanBlockSheets)} × ${CFG.printPrices[cBlock]} ₽`);
+    push('Блок','Бумага', fmt(paperCostBlock)+' ₽', `${packsBlock} пач. × ${fmt(pb.packCost)} ₽`);
+    push('Блок','Формы', fmt(platesCostBlock)+' ₽', `${platesBlock} × ${CFG.platePrice} ₽`);
 
-    const coversPerSheet   = CFG.coversPerA2[format];
+    const coversPerSheet = CFG.coversPerA2[format];
     const cleanCoverSheets = Math.ceil(qty / coversPerSheet);
-    const platesCover      = platesPerSheet(cCover, isSelfTurn);
+    const platesCover = platesPerSheet(cCover, isSelfTurn);
     const wasteCoverSheets = platesCover * CFG.wastePerForm;
     const totalCoverSheets = cleanCoverSheets + wasteCoverSheets;
-    const pc             = CFG.paper[pCover];
-    const packsCover     = Math.ceil(totalCoverSheets / pc.packSize);
+    const pc = CFG.paper[pCover];
+    const packsCover = Math.ceil(totalCoverSheets / pc.packSize);
     const printCostCover = cleanCoverSheets * CFG.printPrices[cCover];
     const paperCostCover = packsCover * pc.packCost;
-    const platesCostCover= platesCover * CFG.platePrice;
-    const lamCostCover   = lamCover > 0 ? totalCoverSheets * lamCover : 0;
+    const platesCostCover = platesCover * CFG.platePrice;
     retailPaper += packsCover * pc.packPrice;
 
-    push('Обложка','Листов А2 на обложку', fmt(cleanCoverSheets)+' шт', `по ${coversPerSheet} шт на А2`);
-    push('Обложка','Печать обложки', fmt(printCostCover)+' ₽', `${fmt(cleanCoverSheets)} отт. × ${CFG.printPrices[cCover]} ₽`);
-    push('Обложка','Бумага обложки', fmt(paperCostCover)+' ₽', `${packsCover} пач. × ${fmt(pc.packCost)} ₽ (${pc.name})`);
-    push('Обложка','Формы обложки', fmt(platesCostCover)+' ₽', `${platesCover} шт × ${CFG.platePrice} ₽`);
+    push('Обложка','Листов А2', fmt(cleanCoverSheets)+' шт');
+    push('Обложка','Печать', fmt(printCostCover)+' ₽', `${fmt(cleanCoverSheets)} × ${CFG.printPrices[cCover]} ₽`);
+    push('Обложка','Бумага', fmt(paperCostCover)+' ₽', `${packsCover} пач. × ${fmt(pc.packCost)} ₽`);
+    push('Обложка','Формы', fmt(platesCostCover)+' ₽', `${platesCover} × ${CFG.platePrice} ₽`);
 
-    const bindPrice = CFG.binding[binding];
-    const bindCost  = qty * bindPrice;
-    const cutCost   = isCut ? (cleanBlockSheets + cleanCoverSheets) * CFG.cut : 0;
-    const creaseCost= isCrease ? totalBlockSheets * CFG.crease : 0;
+    const bindPrice = CFG.binding[binding] || 0;
+    const bindCost = qty * bindPrice;
+    const lamPriceVal = parseInt(lamKey, 10) || 0;
+    const lamCostCover = lamPriceVal > 0 ? totalCoverSheets * lamPriceVal : 0;
+    const cutCost = isCut ? (cleanBlockSheets + cleanCoverSheets) * CFG.cut : 0;
+    const creaseCost = isCrease ? totalBlockSheets * CFG.crease : 0;
+    const foldCost = isFold ? totalBlockSheets * CFG.fold : 0;
 
-    push('Послепечать','Переплет', fmt(bindCost)+' ₽', `${fmt(qty)} шт × ${bindPrice} ₽ (${BINDING_NAMES[binding]})`);
-    if(lamCostCover) push('Послепечать','Ламинация обложки', fmt(lamCostCover)+' ₽', `${totalCoverSheets} л. × ${lamCover} ₽`);
-    if(cutCost)      push('Послепечать','Резка', fmt(cutCost)+' ₽', `${fmt(cleanBlockSheets+cleanCoverSheets)} л. × ${CFG.cut} ₽`);
-    if(creaseCost)   push('Послепечать','Биговка', fmt(creaseCost)+' ₽', `${fmt(totalBlockSheets)} л. × ${CFG.crease} ₽`);
+    push('Послепечать','Переплет', fmt(bindCost)+' ₽', `${fmt(qty)} × ${bindPrice} ₽ (${BINDING_NAMES[binding]})`);
+    if(lamCostCover) push('Послепечать','Ламинация обложки', fmt(lamCostCover)+' ₽', `${totalCoverSheets} × ${lamPriceVal} ₽`);
+    if(cutCost) push('Послепечать','Резка', fmt(cutCost)+' ₽', `${fmt(cleanBlockSheets+cleanCoverSheets)} × ${CFG.cut} ₽`);
+    if(creaseCost) push('Послепечать','Биговка', fmt(creaseCost)+' ₽', `${fmt(totalBlockSheets)} × ${CFG.crease} ₽`);
+    if(foldCost) push('Послепечать','Фальцовка', fmt(foldCost)+' ₽', `${fmt(totalBlockSheets)} × ${CFG.fold} ₽`);
 
-    cost.paper   += paperCostBlock + paperCostCover;
-    cost.plates  += platesCostBlock + platesCostCover;
-    cost.print   += printCostBlock + printCostCover;
+    cost.paper += paperCostBlock + paperCostCover;
+    cost.plates += platesCostBlock + platesCostCover;
+    cost.print += printCostBlock + printCostCover;
     cost.binding += bindCost;
-    cost.postpress += lamCostCover + cutCost + creaseCost;
+    cost.postpress += lamCostCover + cutCost + creaseCost + foldCost;
 
   } else {
     const format = el('leaflet-format').value;
-    const paper  = el('leaflet-paper').value;
-    const color  = el('leaflet-color').value;
+    const paper = el('leaflet-paper').value;
+    const color = el('leaflet-color').value;
+    const lamVal = parseInt(el('leaflet-lam').value, 10) || 0;
     summary = `Листовки · ${format} · ${color} · ${qty} шт.`;
 
-    const itemsPerA2  = CFG.itemsPerA2[format];
+    const itemsPerA2 = CFG.itemsPerA2[format];
     const cleanSheets = Math.ceil(qty / itemsPerA2);
-    const plates      = platesPerSheet(color, isSelfTurn);
+    const plates = platesPerSheet(color, isSelfTurn);
     const wasteSheets = plates * CFG.wastePerForm;
     const totalSheets = cleanSheets + wasteSheets;
-    const pd          = CFG.paper[paper];
-    const packs       = Math.ceil(totalSheets / pd.packSize);
-    const printCost   = cleanSheets * CFG.printPrices[color];
-    const paperCost   = packs * pd.packCost;
-    const platesCost  = plates * CFG.platePrice;
-    const cutCost     = isCut ? cleanSheets * CFG.cut : 0;
-    const creaseCost  = isCrease ? totalSheets * CFG.crease : 0;
+    const pd = CFG.paper[paper];
+    const packs = Math.ceil(totalSheets / pd.packSize);
+    const printCost = cleanSheets * CFG.printPrices[color];
+    const paperCost = packs * pd.packCost;
+    const platesCost = plates * CFG.platePrice;
+    const cutCost = isCut ? cleanSheets * CFG.cut : 0;
+    const creaseCost = isCrease ? totalSheets * CFG.crease : 0;
+    const foldCost = isFold ? totalSheets * CFG.fold : 0;
+    const lamCost = lamVal > 0 ? totalSheets * lamVal : 0;
     retailPaper += packs * pd.packPrice;
 
-    push('Печать','Листов А2 чистых', fmt(cleanSheets)+' шт', `по ${itemsPerA2} шт на А2`);
-    push('Печать','Бумага на приладку', fmt(wasteSheets)+' шт', `${plates} форм × ${CFG.wastePerForm} л.`);
-    push('Печать','Печать (работа)', fmt(printCost)+' ₽', `${fmt(cleanSheets)} отт. × ${CFG.printPrices[color]} ₽`);
-    push('Печать','Бумага', fmt(paperCost)+' ₽', `${packs} пач. × ${fmt(pd.packCost)} ₽ (${pd.name})`);
-    push('Печать','Печатные формы', fmt(platesCost)+' ₽', `${plates} шт × ${CFG.platePrice} ₽`);
+    push('Печать','Листов А2', fmt(cleanSheets)+' шт');
+    push('Печать','Приладка', fmt(wasteSheets)+' шт');
+    push('Печать','Печать (работа)', fmt(printCost)+' ₽', `${fmt(cleanSheets)} × ${CFG.printPrices[color]} ₽`);
+    push('Печать','Бумага', fmt(paperCost)+' ₽', `${packs} пач. × ${fmt(pd.packCost)} ₽`);
+    push('Печать','Формы', fmt(platesCost)+' ₽', `${plates} × ${CFG.platePrice} ₽`);
 
-    if(cutCost)    push('Послепечать','Резка', fmt(cutCost)+' ₽', `${fmt(cleanSheets)} л. × ${CFG.cut} ₽`);
-    if(creaseCost) push('Послепечать','Биговка / Фальцовка', fmt(creaseCost)+' ₽', `${fmt(totalSheets)} л. × ${CFG.crease} ₽`);
+    if(cutCost) push('Послепечать','Резка', fmt(cutCost)+' ₽', `${fmt(cleanSheets)} × ${CFG.cut} ₽`);
+    if(creaseCost) push('Послепечать','Биговка', fmt(creaseCost)+' ₽', `${fmt(totalSheets)} × ${CFG.crease} ₽`);
+    if(foldCost) push('Послепечать','Фальцовка', fmt(foldCost)+' ₽', `${fmt(totalSheets)} × ${CFG.fold} ₽`);
+    if(lamCost) push('Послепечать','Ламинация', fmt(lamCost)+' ₽', `${totalSheets} × ${lamVal} ₽`);
 
-    cost.paper  += paperCost;
+    cost.paper += paperCost;
     cost.plates += platesCost;
-    cost.print  += printCost;
-    cost.postpress += cutCost + creaseCost;
+    cost.print += printCost;
+    cost.postpress += cutCost + creaseCost + foldCost + lamCost;
   }
 
   const total = cost.paper + cost.plates + cost.print + cost.binding + cost.postpress;
-  return { rows, cost, total, qty, summary, product, retailPaper };
+  return { rows, cost, total, qty, summary, product, retailPaper, retailTotal: null };
 }
 
-let lastResult = null;
-let lastMarketPrice = 0;
+function computeDigital(){
+  const D = CFG.digital;
+  const product = el('d-product').value;
+  const qty = Math.max(1, Math.round(num(el('d-qty').value,1)));
+  const isCut = el('d-cut').checked;
+  const isCrease = el('d-crease').checked;
+  const isFold = el('d-fold').checked;
+  const rows = [];
+  const cost = { paper:0, plates:0, print:0, binding:0, postpress:0 };
+  const retail = { paper:0, plates:0, print:0, binding:0, postpress:0 };
+  const push = (s,l,v,d='') => rows.push({section:s,label:l,value:v,detail:d});
+  let summary = '';
+
+  const isBulk = s => s >= D.bulkThreshold;
+  const printPrice = (c,s) => isBulk(s) ? D.printPrices[c].bulk : D.printPrices[c].base;
+  const paperPrice = (p,s) => isBulk(s) ? D.paper[p].bulk : D.paper[p].base;
+  const getPP = k => D.postpress[k] || {cost:0, price:0};
+
+  if(product === 'book' || product === 'brochure'){
+    const isBook = product === 'book';
+    const format = el(isBook?'d-book-format':'d-brochure-format').value;
+    const pages = Math.max(4, Math.round(num(el(isBook?'d-book-pages':'d-brochure-pages').value,4)/4)*4);
+    const pBlock = el(isBook?'d-book-paper':'d-brochure-paper').value;
+    const cBlock = el(isBook?'d-book-color':'d-brochure-color').value;
+    const pCover = el(isBook?'d-book-cover-paper':'d-brochure-cover-paper').value;
+    const cCover = el(isBook?'d-book-cover-color':'d-brochure-cover-color').value;
+    const binding = el(isBook?'d-book-binding':'d-brochure-binding').value;
+    const lamKey = isBook ? el('d-book-cover-lam').value : el('d-brochure-cover-lam').value;
+    summary = `${isBook?'Книга':'Брошюра'} · ${format} · ${pages} стр. · ${qty} экз.`;
+
+    const pagesPerSheet = D.pagesPerA3[format];
+    const sheetsPerCopy = Math.ceil(pages / pagesPerSheet);
+    const blockSheets = sheetsPerCopy * qty;
+
+    const blockPrintCost = blockSheets * D.printCosts[cBlock];
+    const blockPrintPrice = blockSheets * printPrice(cBlock, blockSheets);
+    const blockPaperCost = blockSheets * D.paper[pBlock].cost;
+    const blockPaperPrice = blockSheets * paperPrice(pBlock, blockSheets);
+
+    push('Блок','Листов А3', fmt(blockSheets)+' шт', `${sheetsPerCopy} × ${fmt(qty)}`);
+    push('Блок','Печать', fmt(blockPrintCost)+' ₽', `${fmt(blockSheets)} × ${fmt2(D.printCosts[cBlock])} ₽ (себест.)`);
+    push('Блок','Бумага', fmt(blockPaperCost)+' ₽', `${fmt(blockSheets)} × ${fmt2(D.paper[pBlock].cost)} ₽`);
+
+    const coversPerSheet = D.coversPerA3[format];
+    const coverSheets = Math.ceil(qty / coversPerSheet);
+
+    const coverPrintCost = coverSheets * D.printCosts[cCover];
+    const coverPrintPrice = coverSheets * printPrice(cCover, coverSheets);
+    const coverPaperCost = coverSheets * D.paper[pCover].cost;
+    const coverPaperPrice = coverSheets * paperPrice(pCover, coverSheets);
+
+    push('Обложка','Листов А3', fmt(coverSheets)+' шт');
+    push('Обложка','Печать', fmt(coverPrintCost)+' ₽', `${fmt(coverSheets)} × ${fmt2(D.printCosts[cCover])} ₽`);
+    push('Обложка','Бумага', fmt(coverPaperCost)+' ₽', `${fmt(coverSheets)} × ${fmt2(D.paper[pCover].cost)} ₽`);
+
+    const b = getPP(binding);
+    const bindCost = qty * b.cost;
+    const bindPrice = qty * b.price;
+    push('Послепечать','Переплет', fmt(bindCost)+' ₽', `${fmt(qty)} × ${fmt2(b.cost)} ₽ (${BINDING_NAMES[binding]})`);
+
+    let lamCost = 0, lamPrice = 0;
+    if(lamKey === 'lam1' || lamKey === 'lam2'){
+      const l = getPP(lamKey);
+      lamCost = coverSheets * l.cost;
+      lamPrice = coverSheets * l.price;
+      push('Послепечать','Ламинация обложки', fmt(lamCost)+' ₽', `${fmt(coverSheets)} × ${fmt2(l.cost)} ₽`);
+    }
+
+    const cutSheets = blockSheets + coverSheets;
+    const c = getPP('cut');
+    const cutCost = isCut ? cutSheets * c.cost : 0;
+    const cutPrice = isCut ? cutSheets * c.price : 0;
+    if(isCut) push('Послепечать','Резка', fmt(cutCost)+' ₽', `${fmt(cutSheets)} × ${fmt2(c.cost)} ₽`);
+
+    const cr = getPP('crease');
+    const creaseCost = isCrease ? blockSheets * cr.cost : 0;
+    const creasePrice = isCrease ? blockSheets * cr.price : 0;
+    if(isCrease) push('Послепечать','Биговка', fmt(creaseCost)+' ₽', `${fmt(blockSheets)} × ${fmt2(cr.cost)} ₽`);
+
+    const fd = getPP('fold');
+    const foldCost = isFold ? blockSheets * fd.cost : 0;
+    const foldPrice = isFold ? blockSheets * fd.price : 0;
+    if(isFold) push('Послепечать','Фальцовка', fmt(foldCost)+' ₽', `${fmt(blockSheets)} × ${fmt2(fd.cost)} ₽`);
+
+    cost.paper = blockPaperCost + coverPaperCost;
+    cost.print = blockPrintCost + coverPrintCost;
+    cost.binding = bindCost;
+    cost.postpress = lamCost + cutCost + creaseCost + foldCost;
+    retail.paper = blockPaperPrice + coverPaperPrice;
+    retail.print = blockPrintPrice + coverPrintPrice;
+    retail.binding = bindPrice;
+    retail.postpress = lamPrice + cutPrice + creasePrice + foldPrice;
+
+  } else {
+    const format = el('d-leaflet-format').value;
+    const paper = el('d-leaflet-paper').value;
+    const color = el('d-leaflet-color').value;
+    const lamKey = el('d-leaflet-lam').value;
+    summary = `Листовки · ${format} · ${color} · ${qty} шт.`;
+
+    const itemsPerA3 = D.itemsPerA3[format];
+    const sheets = Math.ceil(qty / itemsPerA3);
+
+    const printCost = sheets * D.printCosts[color];
+    const printPr = sheets * printPrice(color, sheets);
+    const paperCost = sheets * D.paper[paper].cost;
+    const paperPr = sheets * paperPrice(paper, sheets);
+
+    push('Печать','Листов А3', fmt(sheets)+' шт', `по ${itemsPerA3} на А3`);
+    push('Печать','Печать', fmt(printCost)+' ₽', `${fmt(sheets)} × ${fmt2(D.printCosts[color])} ₽ (себест.)`);
+    push('Печать','Бумага', fmt(paperCost)+' ₽', `${fmt(sheets)} × ${fmt2(D.paper[paper].cost)} ₽`);
+
+    const c = getPP('cut');
+    const cutCost = isCut ? sheets * c.cost : 0;
+    const cutPrice = isCut ? sheets * c.price : 0;
+    if(isCut) push('Послепечать','Резка', fmt(cutCost)+' ₽', `${fmt(sheets)} × ${fmt2(c.cost)} ₽`);
+
+    const cr = getPP('crease');
+    const creaseCost = isCrease ? sheets * cr.cost : 0;
+    const creasePrice = isCrease ? sheets * cr.price : 0;
+    if(isCrease) push('Послепечать','Биговка', fmt(creaseCost)+' ₽', `${fmt(sheets)} × ${fmt2(cr.cost)} ₽`);
+
+    const fd = getPP('fold');
+    const foldCost = isFold ? sheets * fd.cost : 0;
+    const foldPrice = isFold ? sheets * fd.price : 0;
+    if(isFold) push('Послепечать','Фальцовка', fmt(foldCost)+' ₽', `${fmt(sheets)} × ${fmt2(fd.cost)} ₽`);
+
+    let lamCost = 0, lamPrice = 0;
+    if(lamKey === 'lam1' || lamKey === 'lam2'){
+      const l = getPP(lamKey);
+      lamCost = sheets * l.cost;
+      lamPrice = sheets * l.price;
+      push('Послепечать','Ламинация', fmt(lamCost)+' ₽', `${fmt(sheets)} × ${fmt2(l.cost)} ₽`);
+    }
+
+    cost.paper = paperCost; cost.print = printCost;
+    cost.postpress = cutCost + creaseCost + foldCost + lamCost;
+    retail.paper = paperPr; retail.print = printPr;
+    retail.postpress = cutPrice + creasePrice + foldPrice + lamPrice;
+  }
+
+  const total = cost.paper + cost.print + cost.binding + cost.postpress;
+  const retailTotal = retail.paper + retail.print + retail.binding + retail.postpress;
+  return { rows, cost, total, qty, summary, product, retailPaper: retail.paper, retailTotal };
+}
+
+function compute(){ return currentMode === 'digital' ? computeDigital() : computeOffset(); }
+
+let lastResult = null, lastMarketPrice = 0;
 
 function render(){
   const r = compute();
   lastResult = r;
+  const cost = r.total;
+  const markup = Math.max(0, num(el('markup').value, 41));
+  const minMargin = Math.max(0, num(el('minMargin').value, 10));
 
-  const cost       = r.total;
-  const markup     = Math.max(0, num(el('markup').value, 41));
-  const minMargin  = Math.max(0, num(el('minMargin').value, 10));
+  let marketPrice;
+  if(r.retailTotal !== null && r.retailTotal !== undefined) marketPrice = r.retailTotal;
+  else marketPrice = cost * (1 + markup/100);
 
-  const marketPrice = cost * (1 + markup/100);
-  const minPrice    = cost * (1 + minMargin/100);
+  const minPrice = cost * (1 + minMargin/100);
 
-  // Логика авто-подстановки: если contractPrice пустой или равен прошлому marketPrice, обновляем
   let contractPrice = num(el('contractPrice').value, -1);
-  if (contractPrice < 0 || (lastMarketPrice > 0 && Math.abs(contractPrice - lastMarketPrice) < 1)) {
+  if(contractPrice < 0 || (lastMarketPrice > 0 && Math.abs(contractPrice - lastMarketPrice) < 1)){
     contractPrice = marketPrice;
     el('contractPrice').value = Math.round(marketPrice);
   }
@@ -781,34 +845,28 @@ function render(){
 
   const managerBenefit = Math.max(0, num(el('managerBenefit').value, 0));
   const marketPlusBenefit = marketPrice + managerBenefit;
-
   const typographyRevenue = contractPrice - managerBenefit;
   const typographyProfit = typographyRevenue - cost;
-  const typographyMargin = typographyRevenue > 0 ? (typographyProfit / typographyRevenue * 100) : 0;
-
+  const typographyMargin = typographyRevenue > 0 ? (typographyProfit/typographyRevenue*100) : 0;
   const isAlarm = typographyRevenue < minPrice;
 
-  // Заполнение KPI
-  el('kCost').textContent = fmt(cost) + ' ₽';
-  el('kCostUnit').textContent = fmt2(cost / r.qty) + ' ₽ / шт';
-  el('kMarket').textContent = fmt(marketPrice) + ' ₽';
-  el('kMarketUnit').textContent = fmt2(marketPrice / r.qty) + ' ₽ / шт';
-  el('kMin').textContent = fmt(minPrice) + ' ₽';
-  el('kMinUnit').textContent = fmt2(minPrice / r.qty) + ' ₽ / шт';
-  el('kMarketPlusBenefit').textContent = fmt(marketPlusBenefit) + ' ₽';
-  el('kMarketPlusBenefitUnit').textContent = fmt2(marketPlusBenefit / r.qty) + ' ₽ / шт';
-
-  el('typographyRevenue').textContent = fmt(typographyRevenue) + ' ₽';
-  el('typographyRevenueUnit').textContent = fmt2(typographyRevenue / r.qty) + ' ₽ / шт';
-  el('typographyProfit').textContent = fmt(typographyProfit) + ' ₽';
-  el('typographyMargin').textContent = fmt2(typographyMargin) + '% маржа типографии';
-
-  el('lblMarkup').textContent = fmt2(markup);
+  el('kCost').textContent = fmt(cost)+' ₽';
+  el('kCostUnit').textContent = fmt2(cost/r.qty)+' ₽ / шт';
+  el('kMarket').textContent = fmt(marketPrice)+' ₽';
+  el('kMarketUnit').textContent = fmt2(marketPrice/r.qty)+' ₽ / шт';
+  el('kMin').textContent = fmt(minPrice)+' ₽';
+  el('kMinUnit').textContent = fmt2(minPrice/r.qty)+' ₽ / шт';
+  el('kMarketPlusBenefit').textContent = fmt(marketPlusBenefit)+' ₽';
+  el('kMarketPlusBenefitUnit').textContent = fmt2(marketPlusBenefit/r.qty)+' ₽ / шт';
+  el('typographyRevenue').textContent = fmt(typographyRevenue)+' ₽';
+  el('typographyRevenueUnit').textContent = fmt2(typographyRevenue/r.qty)+' ₽ / шт';
+  el('typographyProfit').textContent = fmt(typographyProfit)+' ₽';
+  el('typographyMargin').textContent = fmt2(typographyMargin)+'% маржа';
+  if(currentMode === 'offset') el('lblMarkup').textContent = fmt2(markup);
   el('lblMinMargin').textContent = fmt2(minMargin);
   el('calcBadge').textContent = r.summary;
 
-  // Аларм
-  if (isAlarm) {
+  if(isAlarm){
     el('typographyRevenueBlock').classList.add('alarm');
     el('minPriceBlock').classList.add('alarm');
     el('alarmWarning').style.display = 'block';
@@ -820,24 +878,25 @@ function render(){
     el('alarmWarning').style.display = 'none';
   }
 
-  // Breakdown
   let bdHtml = '';
   Object.keys(BREAKDOWN_LABELS).forEach(k=>{
-    const v = r.cost[k];
-    if(!v) return;
-    const p = cost > 0 ? v / cost * 100 : 0;
+    const v = r.cost[k]; if(!v) return;
+    const p = cost > 0 ? v/cost*100 : 0;
     bdHtml += `<div class="bd-row"><div class="bd-name">${BREAKDOWN_LABELS[k]}</div><div class="bd-bar"><i style="width:${Math.max(2,p)}%"></i></div><div class="bd-val">${fmt(v)} ₽</div><div class="bd-pct">${fmt2(p)}%</div></div>`;
   });
   el('breakdown').innerHTML = bdHtml || '<div class="empty">Нет данных</div>';
-  el('bdTotal').textContent = fmt(cost) + ' ₽';
+  el('bdTotal').textContent = fmt(cost)+' ₽';
 
   const ri = el('retailInfo');
-  if(r.retailPaper > 0){
-    const ourPaper = r.cost.paper;
-    const mPaper = ourPaper > 0 ? (r.retailPaper / ourPaper - 1) * 100 : 0;
+  if(r.retailTotal !== null && r.retailTotal !== undefined){
     ri.style.display = 'block';
-    ri.innerHTML = `📄 <b>Бумага по клиентскому прайсу:</b> ${fmt(r.retailPaper)} ₽ · себест. бумаги: ${fmt(ourPaper)} ₽ · наценка на бумагу: <b>${fmt2(mPaper)}%</b>`;
-  }else{ ri.style.display = 'none'; }
+    const markupPct = cost > 0 ? (r.retailTotal/cost - 1)*100 : 0;
+    ri.innerHTML = `📄 <b>Прайс-лист «Цифра»:</b> ${fmt(r.retailTotal)} ₽ · себест.: ${fmt(cost)} ₽ · наценка: <b>${fmt2(markupPct)}%</b>`;
+  } else if(r.retailPaper > 0){
+    const mPaper = r.cost.paper > 0 ? (r.retailPaper/r.cost.paper - 1)*100 : 0;
+    ri.style.display = 'block';
+    ri.innerHTML = `📄 <b>Бумага по клиентскому прайсу:</b> ${fmt(r.retailPaper)} ₽ · себест.: ${fmt(r.cost.paper)} ₽ · наценка: <b>${fmt2(mPaper)}%</b>`;
+  } else ri.style.display = 'none';
 
   const sections = {};
   r.rows.forEach(row => { (sections[row.section] = sections[row.section] || []).push(row); });
@@ -849,18 +908,22 @@ function render(){
     });
   }
   el('rows').innerHTML = rowsHtml;
-
-  el('printTitle').textContent = 'Смета · ' + r.summary;
-  el('printSub').textContent = `${el('clientName').value || 'без клиента'} · ${el('employee').value} · ${new Date().toLocaleString('ru-RU')}`;
 }
 
 function updateUI(){
-  const product = el('product').value;
-  el('leaflet-options').style.display  = product === 'leaflet'  ? 'block' : 'none';
-  el('brochure-options').style.display = product === 'brochure' ? 'block' : 'none';
-  el('book-options').style.display     = product === 'book'     ? 'block' : 'none';
-  el('selfTurn').checked = (product === 'book' || product === 'brochure');
-  lastMarketPrice = 0; // Сброс для пересчёта цены при смене продукта
+  if(currentMode === 'digital'){
+    const p = el('d-product').value;
+    el('d-leaflet-options').style.display = p === 'leaflet' ? 'block' : 'none';
+    el('d-brochure-options').style.display = p === 'brochure' ? 'block' : 'none';
+    el('d-book-options').style.display = p === 'book' ? 'block' : 'none';
+  } else {
+    const p = el('product').value;
+    el('leaflet-options').style.display = p === 'leaflet' ? 'block' : 'none';
+    el('brochure-options').style.display = p === 'brochure' ? 'block' : 'none';
+    el('book-options').style.display = p === 'book' ? 'block' : 'none';
+    el('selfTurn').checked = (p === 'book' || p === 'brochure');
+  }
+  lastMarketPrice = 0;
   render();
 }
 
@@ -870,310 +933,157 @@ function cfgInput(label, path, val, step){
 
 function renderSettings(){
   const box = el('settingsBody');
+  if(currentMode === 'offset') renderOffsetSettings(box);
+  else renderDigitalSettings(box);
+}
+
+function renderOffsetSettings(box){
   let h = '';
   h += '<div class="sec-title">Общее</div><div class="grid">';
-  h += cfgInput('Печатная форма, ₽', 'platePrice', CFG.platePrice, '1');
-  h += cfgInput('Отходов на форму, листов', 'wastePerForm', CFG.wastePerForm, '1');
-  h += cfgInput('Резка, ₽ / лист', 'cut', CFG.cut);
-  h += cfgInput('Биговка / фальцовка, ₽ / лист', 'crease', CFG.crease);
+  h += cfgInput('Форма, ₽', 'platePrice', CFG.platePrice, '1');
+  h += cfgInput('Отходов на форму, л.', 'wastePerForm', CFG.wastePerForm, '1');
+  h += cfgInput('Резка, ₽/лист', 'cut', CFG.cut);
+  h += cfgInput('Биговка, ₽/лист', 'crease', CFG.crease);
+  h += cfgInput('Фальцовка, ₽/лист', 'fold', CFG.fold);
+  h += cfgInput('Ламинация 1 сторона, ₽/лист', 'lam.lam1', CFG.lam.lam1);
+  h += cfgInput('Ламинация 2 стороны, ₽/лист', 'lam.lam2', CFG.lam.lam2);
   h += '</div>';
   h += '<div class="sec-title">Печать, ₽ за оттиск А2</div><div class="grid">';
-  ['1+0','1+1','4+0','4+4'].forEach(k=>{ h += cfgInput('Красочность ' + k, 'printPrices.' + k, CFG.printPrices[k]); });
+  ['1+0','1+1','4+0','4+4'].forEach(k=>{ h += cfgInput(k, 'printPrices.'+k, CFG.printPrices[k]); });
   h += '</div>';
-  h += '<div class="sec-title">Бумага — себестоимость и клиентский прайс</div>';
+  h += '<div class="sec-title">Бумага — закупка и клиентский прайс</div>';
   Object.keys(CFG.paper).forEach(k=>{
     const p = CFG.paper[k];
-    h += `<div class="paper-name">${p.name}</div>`;
-    h += `<div class="grid three">
-      ${cfgInput('Листов А2 в пачке', 'paper.' + k + '.packSize', p.packSize, '1')}
-      ${cfgInput('Себестоимость пачки, ₽', 'paper.' + k + '.packCost', p.packCost, '1')}
-      ${cfgInput('Клиентская цена пачки, ₽', 'paper.' + k + '.packPrice', p.packPrice, '1')}
-    </div>`;
-    h += `<div class="paper-rate" data-rate="${k}"></div>`;
+    h += `<div class="paper-name">${p.name}</div><div class="grid three">`;
+    h += cfgInput('Листов в пачке', 'paper.'+k+'.packSize', p.packSize, '1');
+    h += cfgInput('Закупка пачки, ₽', 'paper.'+k+'.packCost', p.packCost, '1');
+    h += cfgInput('Клиент пачки, ₽', 'paper.'+k+'.packPrice', p.packPrice, '1');
+    h += '</div>';
   });
-  h += '<div class="sec-title">Переплёт, ₽ / экземпляр</div><div class="grid">';
-  ['saddle','perfect','soft','hard'].forEach(k=>{ h += cfgInput(BINDING_NAMES[k], 'binding.' + k, CFG.binding[k], '1'); });
+  h += '<div class="sec-title">Переплёт, ₽/шт</div><div class="grid">';
+  ['saddle','saddle1','saddle2','perfect','soft','hard','integral','spring'].forEach(k=>{
+    h += cfgInput(BINDING_NAMES[k], 'binding.'+k, CFG.binding[k] || 0, '1');
+  });
   h += '</div>';
   box.innerHTML = h;
-  updatePaperRates();
+}
+
+function renderDigitalSettings(box){
+  const D = CFG.digital;
+  let h = '';
+  h += '<div class="sec-title">Порог объёма</div><div class="grid">';
+  h += cfgInput('Порог «от N листов А3»', 'digital.bulkThreshold', D.bulkThreshold, '1');
+  h += '</div>';
+  h += '<div class="sec-title">Печать: себест. / до 50 / от 50, ₽ за A3</div>';
+  ['1+0','1+1','4+0','4+4'].forEach(k=>{
+    h += `<div class="paper-name">${k}</div><div class="grid three">`;
+    h += cfgInput('Себест.', 'digital.printCosts.'+k, D.printCosts[k], '0.01');
+    h += cfgInput('До 50', 'digital.printPrices.'+k+'.base', D.printPrices[k].base, '0.01');
+    h += cfgInput('От 50', 'digital.printPrices.'+k+'.bulk', D.printPrices[k].bulk, '0.01');
+    h += '</div>';
+  });
+  h += '<div class="sec-title">Бумага: себест. / до 50 / от 50, ₽ за A3</div>';
+  Object.keys(D.paper).forEach(k=>{
+    const p = D.paper[k];
+    h += `<div class="paper-name">${p.name}</div><div class="grid three">`;
+    h += cfgInput('Себест.', 'digital.paper.'+k+'.cost', p.cost, '0.01');
+    h += cfgInput('До 50', 'digital.paper.'+k+'.base', p.base, '0.01');
+    h += cfgInput('От 50', 'digital.paper.'+k+'.bulk', p.bulk, '0.01');
+    h += '</div>';
+  });
+  h += '<div class="sec-title">Постпечать: себест. / клиент</div>';
+  const ppNames = {
+    cut:'Резка, ₽/лист', crease:'Биговка, ₽/лист', fold:'Фальцовка, ₽/лист',
+    lam1:'Ламинация 1 ст., ₽/A3', lam2:'Ламинация 2 ст., ₽/A3',
+    saddle1:'Скрепка (1)', saddle2:'Скрепка (2)', perfect:'Термопереплет', spring:'Пружина', hard:'Твердый переплет'
+  };
+  Object.keys(D.postpress).forEach(k=>{
+    h += `<div class="paper-name">${ppNames[k] || k}</div><div class="grid">`;
+    h += cfgInput('Себест.', 'digital.postpress.'+k+'.cost', D.postpress[k].cost, '0.01');
+    h += cfgInput('Клиент', 'digital.postpress.'+k+'.price', D.postpress[k].price, '0.01');
+    h += '</div>';
+  });
+  box.innerHTML = h;
 }
 
 el('settingsBody').addEventListener('input', e=>{
-  const t = e.target.closest('[data-cfg]');
-  if(!t) return;
+  const t = e.target.closest('[data-cfg]'); if(!t) return;
   const path = t.dataset.cfg;
   const cur = getByPath(CFG, path);
   setByPath(CFG, path, num(t.value, cur));
-  saveCfg();
-  if(path.indexOf('paper.') === 0) updatePaperRates();
-  render();
+  saveCfg(); render();
 });
 
 el('resetCfg').addEventListener('click', ()=>{
-  if(!confirm('Сбросить все тарифы к значениям по умолчанию?')) return;
+  if(!confirm('Сбросить все тарифы?')) return;
   CFG = JSON.parse(JSON.stringify(DEFAULT_CFG));
   saveCfg(); renderSettings(); render();
   toast('Тарифы сброшены');
 });
 
-const EMP_KEY = 'offset_calc_employees';
+const EMP_KEY = 'calc_employees';
 function loadEmployees(){
   let names = ['Сотрудник 1','Сотрудник 2','Сотрудник 3'];
-  try{
-    const saved = JSON.parse(localStorage.getItem(EMP_KEY) || 'null');
-    if(Array.isArray(saved) && saved.length === 3) names = saved;
-  }catch(e){}
+  try{ const saved = JSON.parse(localStorage.getItem(EMP_KEY) || 'null'); if(Array.isArray(saved) && saved.length === 3) names = saved; }catch(e){}
   const sel = el('employee');
   sel.innerHTML = names.map(n => `<option>${escHtml(n)}</option>`).join('');
   const last = localStorage.getItem(EMP_KEY + '_last');
   if(last !== null && names[+last]) sel.selectedIndex = +last;
 }
-function saveEmployees(){
-  localStorage.setItem(EMP_KEY, JSON.stringify(Array.from(el('employee').options).map(o=>o.textContent)));
-}
-el('employee').addEventListener('change', ()=>{ localStorage.setItem(EMP_KEY+'_last', el('employee').selectedIndex); render(); });
+function saveEmployees(){ localStorage.setItem(EMP_KEY, JSON.stringify(Array.from(el('employee').options).map(o=>o.textContent))); }
+el('employee').addEventListener('change', ()=>{ localStorage.setItem(EMP_KEY+'_last', el('employee').selectedIndex); });
 el('renameEmp').addEventListener('click', ()=>{
   const sel = el('employee');
-  const name = prompt('Имя сотрудника:', sel.options[sel.selectedIndex].textContent);
-  if(name && name.trim()){
-    sel.options[sel.selectedIndex].textContent = name.trim();
-    saveEmployees();
-    toast('Имя сохранено');
-  }
+  const name = prompt('Имя:', sel.options[sel.selectedIndex].textContent);
+  if(name && name.trim()){ sel.options[sel.selectedIndex].textContent = name.trim(); saveEmployees(); toast('Имя сохранено'); }
 });
 
 let dirHandle = null;
 const FSA_SUPPORTED = 'showDirectoryPicker' in window;
-const PREF_KEY = 'offset_calc_prefs_v1';
-
-function loadPrefs(){ 
-  try{ return JSON.parse(localStorage.getItem(PREF_KEY) || '{}'); }catch(e){ return {}; } 
+async function idbOpen(){
+  return new Promise((res,rej)=>{
+    const r = indexedDB.open('calc_db', 1);
+    r.onupgradeneeded = () => { if(!r.result.objectStoreNames.contains('kv')) r.result.createObjectStore('kv'); };
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
 }
-function savePrefs(){ 
-  localStorage.setItem(PREF_KEY, JSON.stringify({ 
-    saveHtml: el('saveHtml').checked,
-    saveJson: el('saveJson').checked,
-    saveCsv: el('saveCsv').checked
-  })); 
-}
+async function kvSet(k,v){ const db = await idbOpen(); return new Promise((res,rej)=>{ const tx = db.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+async function kvGet(k){ const db = await idbOpen(); return new Promise((res,rej)=>{ const tx = db.transaction('kv','readonly'); const rq = tx.objectStore('kv').get(k); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); }); }
 
 function updateFolderUI(){
   const b = el('folderBtn');
-  if(dirHandle){
-    b.textContent = '📁 ' + dirHandle.name;
-    b.classList.add('ok');
-    b.title = 'Расчёты сохраняются в папку «' + dirHandle.name + '»';
-  }else{
-    b.textContent = FSA_SUPPORTED ? '📁 Папка не выбрана' : '📁 Скачивание в «Загрузки»';
-    b.classList.remove('ok');
-    b.title = FSA_SUPPORTED ? 'Нажмите, чтобы выбрать папку для расчётов' : 'Браузер не поддерживает выбор папки';
-  }
+  if(dirHandle){ b.textContent = '📁 '+dirHandle.name; b.classList.add('ok'); }
+  else { b.textContent = FSA_SUPPORTED ? '📁 Папка не выбрана' : '📁 Скачивание'; b.classList.remove('ok'); }
 }
-
 async function pickFolder(){
-  if(!FSA_SUPPORTED){ toast('Браузер не поддерживает выбор папки. Файлы будут скачиваться.', true); return null; }
-  try{
-    const h = await window.showDirectoryPicker({ mode:'readwrite', id:'offset-calc', startIn:'documents' });
-    dirHandle = h;
-    await kvSet('dirHandle', h);
-    updateFolderUI();
-    toast('Папка выбрана: ' + h.name);
-    return h;
-  }catch(e){
-    if(e && e.name !== 'AbortError') toast('Не удалось выбрать папку: ' + e.message, true);
-    return null;
-  }
+  if(!FSA_SUPPORTED){ toast('Браузер не поддерживает. Будет скачивание.', true); return null; }
+  try{ const h = await window.showDirectoryPicker({ mode:'readwrite' }); dirHandle = h; await kvSet('dirHandle', h); updateFolderUI(); toast('Папка: '+h.name); return h; }
+  catch(e){ return null; }
 }
-
 async function ensureDir(){
   if(!FSA_SUPPORTED) return null;
   if(!dirHandle) return await pickFolder();
   try{
-    let perm = await dirHandle.queryPermission({ mode:'readwrite' });
-    if(perm !== 'granted') perm = await dirHandle.requestPermission({ mode:'readwrite' });
-    if(perm !== 'granted'){ toast('Нет доступа к папке — выберите заново', true); dirHandle = null; updateFolderUI(); return null; }
+    let p = await dirHandle.queryPermission({ mode:'readwrite' });
+    if(p !== 'granted') p = await dirHandle.requestPermission({ mode:'readwrite' });
+    if(p !== 'granted'){ dirHandle = null; updateFolderUI(); return null; }
     return dirHandle;
-  }catch(e){
-    dirHandle = null; updateFolderUI();
-    return await pickFolder();
-  }
+  }catch(e){ dirHandle = null; updateFolderUI(); return await pickFolder(); }
 }
-
-async function writeFileToDir(name, content, type){
+async function writeFile(name, content, type){
   const fh = await dirHandle.getFileHandle(name, { create:true });
   const w = await fh.createWritable();
-  await w.write(new Blob([content], { type: type || 'text/plain;charset=utf-8' }));
-  await w.close();
+  await w.write(new Blob([content], { type })); await w.close();
 }
-
-async function appendCsv(line){
-  const CSV_NAME = 'Журнал расчётов v4.csv';
-  const HEADER = 'Дата;Сотрудник;Клиент;Тип;Тираж;Себестоимость;Рын. прайс;Мин. цена;Договор. цена;Бенефит;Типография получает;Прибыль типографии;Маржа типографии;Комментарий';
-  let text = '';
-  try{
-    const fh = await dirHandle.getFileHandle(CSV_NAME);
-    const file = await fh.getFile();
-    text = await file.text();
-  }catch(e){ text = ''; }
-  if(!text) text = '\uFEFF' + HEADER + '\r\n';
-  text += line + '\r\n';
-  await writeFileToDir(CSV_NAME, text, 'text/csv;charset=utf-8');
-}
-
 function downloadFile(name, content, type){
-  const blob = new Blob([content], { type: type || 'text/plain;charset=utf-8' });
+  const blob = new Blob([content], { type });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = name;
+  const a = document.createElement('a'); a.href = url; a.download = name;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 4000);
 }
-
-// ВОССТАНОВЛЕННАЯ функция для вывода тарифов в HTML-смете
-function buildCfgHtml(cfg){
-  if(!cfg) return '<i>нет данных</i>';
-  let h = '<div style="font-size:12px;line-height:1.7">';
-  const line = (l,v) => `<div style="display:flex;justify-content:space-between;border-bottom:1px dotted #eaeaea;padding:3px 0"><span>${escHtml(l)}</span><b>${v}</b></div>`;
-  h += line('Печатная форма', fmt(cfg.platePrice) + ' ₽');
-  h += line('Отходы на форму', fmt(cfg.wastePerForm) + ' л.');
-  h += line('Резка', fmt2(cfg.cut) + ' ₽/л.');
-  h += line('Биговка / фальцовка', fmt2(cfg.crease) + ' ₽/л.');
-  ['1+0','1+1','4+0','4+4'].forEach(k => { h += line('Печать ' + k + ' (₽/отт. А2)', fmt(cfg.printPrices[k]) + ' ₽'); });
-  Object.keys(cfg.paper).forEach(k=>{
-    const p = cfg.paper[k];
-    h += line(p.name, `${fmt(p.packSize)} л. · себест. ${fmt(p.packCost)} ₽ · клиент ${fmt(p.packPrice)} ₽`);
-  });
-  ['saddle','perfect','soft','hard'].forEach(k => { h += line(BINDING_NAMES[k], fmt(cfg.binding[k]) + ' ₽/шт'); });
-  h += '</div>';
-  return h;
-}
-
-function buildHtmlSmeta(snap){
-  const r = snap.result;
-  const rows = snap.rows || [];
-  const sections = {};
-  rows.forEach(row => { (sections[row.section] = sections[row.section] || []).push(row); });
-  let sectionsHtml = '';
-  for(const name in sections){
-    sectionsHtml += `<div class="section"><div class="sec-title">${escHtml(name)}</div>`;
-    sections[name].forEach(row=>{
-      const det = row.detail ? ` <span class="det">${escHtml(row.detail)}</span>` : '';
-      sectionsHtml += `<div class="row"><span>${escHtml(row.label)}</span><span>${escHtml(row.value)}${det}</span></div>`;
-    });
-    sectionsHtml += '</div>';
-  }
-
-  const alarmHtml = r.typographyRevenue < r.minPrice
-    ? `<div style="margin:15px 0;padding:12px;background:#fdeeee;border:2px solid #c62828;border-radius:8px;color:#c62828;font-weight:bold;text-align:center;font-size:15px;">
-        ⚠️ ТИПОГРАФИЯ НЕДОПОЛУЧАЕТ ${fmt(r.minPrice - r.typographyRevenue)} ₽ ДО МИНИМАЛЬНОЙ ЦЕНЫ (${fmt(r.minPrice)} ₽)!
-      </div>` : '';
-
-  return `<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
-<title>Смета — ${escHtml(snap.client || 'без клиента')}</title>
-<style>
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;max-width:820px;margin:0 auto;padding:40px 20px;color:#1a1a1a;font-size:14px;line-height:1.55}
-.head{border-bottom:3px solid #8B1C42;padding-bottom:18px;margin-bottom:24px}
-.head h1{color:#8B1C42;margin:0 0 6px;font-size:22px;font-weight:600}
-.head .sub{color:#666;font-size:13px}
-.meta{color:#555;font-size:13px;margin-bottom:24px;line-height:1.7}
-.meta b{color:#1a1a1a}
-.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:24px 0}
-.kpi{background:#FCF2F5;padding:12px 14px;border-radius:8px;border:1px solid rgba(139,28,66,.08)}
-.kpi .l{font-size:10.5px;text-transform:uppercase;color:#666;font-weight:600;letter-spacing:.4px}
-.kpi .v{font-size:20px;font-weight:500;color:#8B1C42;letter-spacing:-.3px;margin-top:3px}
-.kpi .s{font-size:12px;color:#888;margin-top:2px}
-.kpi.blue{background:#eff6fd;border-color:#cfe3f7}.kpi.blue .v{color:#2b6da8}
-.kpi.green{background:#eef9f1;border-color:#c3e9cf}.kpi.green .v{color:#1a7f37}
-.kpi.red{background:#fdeeee;border-color:#f5c6c6}.kpi.red .v{color:#c62828}
-.section{margin:18px 0}
-.sec-title{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#2b6da8;padding-top:10px;border-top:1px solid #eaeaea;margin-bottom:4px}
-.section:first-child .sec-title{border-top:none;padding-top:0}
-.row{display:flex;justify-content:space-between;gap:15px;padding:6px 0;font-size:13px;border-bottom:1px dashed #f0f0f0}
-.row:last-child{border-bottom:none}
-.row span:first-child{color:#666}
-.row span:last-child{font-weight:600;text-align:right}
-.det{font-size:11px;color:#aaa;font-weight:400;margin-left:5px}
-.total{display:flex;justify-content:space-between;padding:14px 0 0;margin-top:14px;border-top:2px solid #2b6da8;font-weight:600;font-size:16px;color:#8B1C42}
-.note{margin-top:24px;padding:14px 16px;background:#fff8e6;border:1px solid #ffe0a3;border-radius:8px;font-size:13px;color:#7a5a00}
-.foot{margin-top:30px;padding-top:14px;border-top:1px solid #eaeaea;font-size:11.5px;color:#999;text-align:center;line-height:1.7}
-@media print{body{padding:0;margin:20px}@page{margin:15mm}}
-</style>
-</head>
-<body>
-  <div class="head">
-    <h1>Типография Екатеринбургской Епархии</h1>
-    <div class="sub">Смета офсетной печати · ${escHtml(snap.summary)}</div>
-  </div>
-  <div class="meta">
-    <b>Клиент:</b> ${escHtml(snap.client || '—')}<br>
-    <b>Расчёт подготовил:</b> ${escHtml(snap.employee)}<br>
-    <b>Дата:</b> ${escHtml(snap.savedAtLocal)}
-  </div>
-  
-  <h3 style="margin-top:20px;color:#8B1C42;font-size:16px;border-bottom:2px solid #8B1C42;padding-bottom:4px">Затраты и рыночные ориентиры</h3>
-  <div class="kpi-grid">
-    <div class="kpi"><div class="l">Себестоимость</div><div class="v">${fmt(r.cost)} ₽</div><div class="s">${fmt2(r.costPerUnit)} ₽ / шт</div></div>
-    <div class="kpi red"><div class="l">Минимальная цена</div><div class="v">${fmt(r.minPrice)} ₽</div><div class="s">порог ${fmt2(r.minMargin)}% маржи</div></div>
-    <div class="kpi blue"><div class="l">Рыночный прайс</div><div class="v">${fmt(r.marketPrice)} ₽</div><div class="s">наценка ${fmt2(r.markup)}%</div></div>
-    <div class="kpi blue"><div class="l">Рыночный прайс + Бенефит</div><div class="v">${fmt(r.marketPrice + r.managerBenefit)} ₽</div></div>
-  </div>
-
-  <h3 style="margin-top:20px;color:#8B1C42;font-size:16px;border-bottom:2px solid #8B1C42;padding-bottom:4px">Условия сделки</h3>
-  <div class="kpi-grid">
-    <div class="kpi"><div class="l">Договорная цена</div><div class="v">${fmt(r.contractPrice)} ₽</div></div>
-    <div class="kpi"><div class="l">Бенефит менеджера</div><div class="v">${fmt(r.managerBenefit)} ₽</div></div>
-    <div class="kpi green"><div class="l">Типография получает</div><div class="v">${fmt(r.typographyRevenue)} ₽</div></div>
-    <div class="kpi green"><div class="l">Прибыль типографии</div><div class="v">${fmt(r.typographyProfit)} ₽</div><div class="s">${fmt2(r.typographyMargin)}% маржа</div></div>
-  </div>
-  
-  ${alarmHtml}
-
-  <div class="section" style="margin-top:24px">
-    <div class="sec-title">Себестоимость по статьям</div>
-    ${sectionsHtml}
-    <div class="total"><span>Итого себестоимость</span><span>${fmt(r.cost)} ₽</span></div>
-  </div>
-  
-  ${snap.note ? `<div class="note"><b>Комментарий:</b> ${escHtml(snap.note)}</div>` : ''}
-  <div class="foot">
-    Смета сформирована внутренним калькулятором типографии · ${escHtml(snap.savedAtLocal)}<br>
-    Цены указаны без НДС. Тарифы на момент расчёта — в разделе ниже.
-  </div>
-  <details style="margin-top:20px;font-size:12px;color:#666">
-    <summary style="cursor:pointer;color:#2b6da8;font-weight:600">Использованные тарифы</summary>
-    <div style="margin-top:10px">${buildCfgHtml(snap.cfgUsed)}</div>
-  </details>
-</body>
-</html>`;
-}
-
-const FIELD_IDS = [
-  'product','qty',
-  'leaflet-format','leaflet-paper','leaflet-color',
-  'brochure-format','brochure-pages','brochure-paper','brochure-color',
-  'brochure-cover-paper','brochure-cover-color','brochure-binding',
-  'book-format','book-pages','book-paper','book-color',
-  'book-cover-paper','book-cover-color','book-cover-lam','book-binding',
-  'markup', 'minMargin', 'clientName', 'note',
-  'contractPrice', 'managerBenefit'
-];
-const CHK_IDS = ['selfTurn', 'cut', 'crease'];
-
-function gatherInputs(){
-  const o = {};
-  FIELD_IDS.forEach(id => { const e = el(id); if(e) o[id] = e.value; });
-  CHK_IDS.forEach(id => { const e = el(id); if(e) o[id] = e.checked; });
-  return o;
-}
-function applyInputs(o){
-  if(!o) return;
-  FIELD_IDS.forEach(id => { if(o[id] !== undefined && el(id)) el(id).value = o[id]; });
-  CHK_IDS.forEach(id => { if(o[id] !== undefined && el(id)) el(id).checked = !!o[id]; });
-  updateUI();
-}
+function safeName(s){ return String(s).replace(/[\\/:*?"<>|]+/g,'-').replace(/\s+/g,' ').trim().slice(0,120); }
+function fileStamp(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}`; }
 
 function buildSnapshot(){
   const r = compute();
@@ -1183,259 +1093,182 @@ function buildSnapshot(){
   const contractPrice = num(el('contractPrice').value, 0);
   const managerBenefit = Math.max(0, num(el('managerBenefit').value, 0));
 
-  const marketPrice = cost * (1 + markup/100);
-  const minPrice = cost * (1 + minMargin/100);
+  const marketPrice = (r.retailTotal !== null && r.retailTotal !== undefined) ? r.retailTotal : cost*(1+markup/100);
+  const minPrice = cost*(1+minMargin/100);
   const typographyRevenue = contractPrice - managerBenefit;
   const typographyProfit = typographyRevenue - cost;
-  const typographyMargin = typographyRevenue > 0 ? (typographyProfit / typographyRevenue * 100) : 0;
+  const typographyMargin = typographyRevenue > 0 ? (typographyProfit/typographyRevenue*100) : 0;
 
   const now = new Date();
   return {
-    version: 6,
-    savedAt: now.toISOString(),
-    savedAtLocal: now.toLocaleString('ru-RU'),
-    employee: el('employee').value,
-    client: el('clientName').value.trim(),
-    note: el('note').value.trim(),
-    summary: r.summary,
-    qty: r.qty,
-    rows: r.rows,
+    version: 1, mode: currentMode,
+    savedAt: now.toISOString(), savedAtLocal: now.toLocaleString('ru-RU'),
+    employee: el('employee').value, client: el('clientName').value.trim(), note: el('note').value.trim(),
+    summary: r.summary, qty: r.qty, rows: r.rows,
     cfgUsed: JSON.parse(JSON.stringify(CFG)),
     result: {
-      cost: Math.round(cost),
-      costPerUnit: +(cost / r.qty).toFixed(2),
-      marketPrice: Math.round(marketPrice),
-      markup: +markup.toFixed(2),
-      minPrice: Math.round(minPrice),
-      minMargin: +minMargin.toFixed(2),
-      contractPrice: Math.round(contractPrice),
-      managerBenefit: Math.round(managerBenefit),
+      cost: Math.round(cost), costPerUnit: +(cost/r.qty).toFixed(2),
+      marketPrice: Math.round(marketPrice), minPrice: Math.round(minPrice), minMargin: +minMargin.toFixed(2),
+      contractPrice: Math.round(contractPrice), managerBenefit: Math.round(managerBenefit),
       typographyRevenue: Math.round(typographyRevenue),
       typographyProfit: Math.round(typographyProfit),
       typographyMargin: +typographyMargin.toFixed(2),
       retailPaper: Math.round(r.retailPaper)
-    },
-    costBreakdown: {
-      paper: Math.round(r.cost.paper),
-      plates: Math.round(r.cost.plates),
-      print: Math.round(r.cost.print),
-      binding: Math.round(r.cost.binding),
-      postpress: Math.round(r.cost.postpress)
-    },
-    inputs: gatherInputs()
+    }
   };
 }
 
-const csvEscape = v => {
-  const s = String(v == null ? '' : v);
-  return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
-};
-
-function csvLine(snap){
+function buildHtmlSmeta(snap){
   const r = snap.result;
-  return [
-    snap.savedAtLocal, snap.employee, snap.client || '—', snap.summary, snap.qty,
-    r.cost, r.marketPrice, r.minPrice, r.contractPrice, r.managerBenefit,
-    r.typographyRevenue, r.typographyProfit, r.typographyMargin, snap.note
-  ].map(csvEscape).join(';');
-}
-
-function safeName(s){
-  return String(s).replace(/[\\/:*?"<>|]+/g,'-').replace(/\s+/g,' ').trim().slice(0,120);
-}
-function fileStamp(d){
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+  const sections = {};
+  (snap.rows || []).forEach(row => { (sections[row.section] = sections[row.section] || []).push(row); });
+  let sectionsHtml = '';
+  for(const name in sections){
+    sectionsHtml += `<div class="section"><div class="sec-title">${escHtml(name)}</div>`;
+    sections[name].forEach(row=>{
+      const det = row.detail ? ` <span class="det">${escHtml(row.detail)}</span>` : '';
+      sectionsHtml += `<div class="row"><span>${escHtml(row.label)}</span><span>${escHtml(row.value)}${det}</span></div>`;
+    });
+    sectionsHtml += '</div>';
+  }
+  const modeName = snap.mode === 'digital' ? 'Цифровая' : 'Офсетная';
+  const alarmHtml = r.typographyRevenue < r.minPrice
+    ? `<div style="margin:15px 0;padding:12px;background:#fdeeee;border:2px solid #c62828;border-radius:8px;color:#c62828;font-weight:bold;text-align:center;">⚠️ Недополучает ${fmt(r.minPrice-r.typographyRevenue)} ₽ до минимума ${fmt(r.minPrice)} ₽!</div>` : '';
+  return `<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><title>Смета</title>
+<style>body{font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:40px 20px;color:#1a1a1a;font-size:14px}
+.head{border-bottom:3px solid #8B1C42;padding-bottom:15px;margin-bottom:20px}.head h1{color:#8B1C42;margin:0 0 4px;font-size:22px}
+.sub{color:#666;font-size:13px}.meta{color:#555;margin-bottom:20px;line-height:1.7}.meta b{color:#1a1a1a}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}.k{background:#FCF2F5;padding:10px 12px;border-radius:8px}
+.k .l{font-size:10px;color:#666;text-transform:uppercase;font-weight:600}.k .v{font-size:18px;color:#8B1C42;font-weight:500;margin-top:2px}
+.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;color:#2b6da8;padding-top:8px;border-top:1px solid #eee;margin-top:12px}
+.row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px dashed #eee}
+.det{color:#aaa;font-size:11px;margin-left:4px}.total{padding:10px 0;margin-top:10px;border-top:2px solid #2b6da8;font-weight:600;color:#8B1C42;display:flex;justify-content:space-between}
+.foot{margin-top:20px;color:#999;font-size:11px;text-align:center;border-top:1px solid #eee;padding-top:10px}</style>
+</head><body>
+<div class="head"><h1>Типография Екатеринбургской Епархии</h1><div class="sub">Смета ${modeName} печати · ${escHtml(snap.summary)}</div></div>
+<div class="meta"><b>Клиент:</b> ${escHtml(snap.client||'—')}<br><b>Менеджер:</b> ${escHtml(snap.employee)}<br><b>Дата:</b> ${escHtml(snap.savedAtLocal)}</div>
+<div class="kpi">
+<div class="k"><div class="l">Себестоимость</div><div class="v">${fmt(r.cost)} ₽</div><div style="font-size:11px;color:#888">${fmt2(r.costPerUnit)} ₽/шт</div></div>
+<div class="k"><div class="l">Мин. цена</div><div class="v">${fmt(r.minPrice)} ₽</div></div>
+<div class="k"><div class="l">Договорная</div><div class="v">${fmt(r.contractPrice)} ₽</div></div>
+<div class="k"><div class="l">Бенефит</div><div class="v">${fmt(r.managerBenefit)} ₽</div></div>
+</div>
+${alarmHtml}
+<div class="section"><div class="sec-title">Себестоимость по статьям</div>${sectionsHtml}<div class="total"><span>Итого</span><span>${fmt(r.cost)} ₽</span></div></div>
+<div class="foot">Смета сформирована внутренним калькулятором · ${escHtml(snap.savedAtLocal)}</div>
+</body></html>`;
 }
 
 async function saveCalc(){
   const snap = buildSnapshot();
   const baseName = safeName(`${fileStamp(new Date())}_${snap.employee}_${snap.client || 'без клиента'}`);
-  
-  const doHtml = el('saveHtml').checked;
-  const doJson = el('saveJson').checked;
-  const doCsv = el('saveCsv').checked;
-
-  if (!doHtml && !doJson && !doCsv) {
-    toast('Выберите хотя бы один формат для сохранения!', true);
-    return;
-  }
-
-  const html = doHtml ? buildHtmlSmeta(snap) : '';
-  const json = doJson ? JSON.stringify(snap, null, 2) : '';
-
+  const html = buildHtmlSmeta(snap);
+  const json = JSON.stringify(snap, null, 2);
   const dir = await ensureDir();
-
   if(dir){
     try{
-      if(doHtml) await writeFileToDir(baseName + '.html', html, 'text/html;charset=utf-8');
-      if(doJson) await writeFileToDir(baseName + '.json', json, 'application/json;charset=utf-8');
-      if(doCsv) await appendCsv(csvLine(snap));
-      
-      let savedList = [];
-      if(doHtml) savedList.push('HTML');
-      if(doJson) savedList.push('JSON');
-      if(doCsv) savedList.push('CSV');
-      toast(`Сохранено в «${dir.name}»: ${savedList.join(' + ')}`);
-    }catch(e){
-      toast('Ошибка записи: ' + e.message, true);
-      if(doHtml) downloadFile(baseName + '.html', html, 'text/html');
-      if(doJson) downloadFile(baseName + '.json', json, 'application/json');
-    }
+      await writeFile(baseName+'.html', html, 'text/html;charset=utf-8');
+      await writeFile(baseName+'.json', json, 'application/json;charset=utf-8');
+      toast(`Сохранено в «${dir.name}»`);
+    }catch(e){ toast('Ошибка: '+e.message, true); }
   } else {
-    if(doHtml) downloadFile(baseName + '.html', html, 'text/html');
-    if(doJson) downloadFile(baseName + '.json', json, 'application/json');
-    let savedList = [];
-    if(doHtml) savedList.push('HTML');
-    if(doJson) savedList.push('JSON');
-    toast(`Скачано в «Загрузки»: ${savedList.join(' + ')}`);
+    downloadFile(baseName+'.html', html, 'text/html');
+    downloadFile(baseName+'.json', json, 'application/json');
+    toast('Скачано в «Загрузки»');
   }
-
-  pushHistory(snap);
-  renderHistory();
+  pushHistory(snap); renderHistory();
 }
 
 el('folderBtn').addEventListener('click', pickFolder);
 el('saveBtn').addEventListener('click', saveCalc);
-
 el('printBtn').addEventListener('click', () => window.print());
-
 el('copyBtn').addEventListener('click', () => {
-  const s = buildSnapshot();
-  const r = s.result;
-  const txt =
-`СМЕТА ОФСЕТНОЙ ПЕЧАТИ (внутренняя)
+  const s = buildSnapshot(); const r = s.result;
+  const txt = `СМЕТА ${s.mode === 'digital' ? 'ЦИФРОВОЙ' : 'ОФСЕТНОЙ'} ПЕЧАТИ
 ${s.summary}
-Клиент: ${s.client || '—'}
-Расчёт подготовил: ${s.employee}
+Клиент: ${s.client||'—'}
+Менеджер: ${s.employee}
 Дата: ${s.savedAtLocal}
 ------------------------------------------
 Себестоимость:      ${fmt(r.cost)} ₽ (${fmt2(r.costPerUnit)} ₽/шт)
-Рыночный прайс:     ${fmt(r.marketPrice)} ₽ (наценка ${fmt2(r.markup)}%)
-Минимальная цена:   ${fmt(r.minPrice)} ₽ (маржа ${fmt2(r.minMargin)}%)
+Мин. цена:          ${fmt(r.minPrice)} ₽
+Рын. прайс:         ${fmt(r.marketPrice)} ₽
 ------------------------------------------
 Договорная цена:    ${fmt(r.contractPrice)} ₽
-Бенефит менеджера:  ${fmt(r.managerBenefit)} ₽
+Бенефит:            ${fmt(r.managerBenefit)} ₽
 Типография получает:${fmt(r.typographyRevenue)} ₽
-Прибыль типографии: ${fmt(r.typographyProfit)} ₽ (${fmt2(r.typographyMargin)}%)
-${r.typographyRevenue < r.minPrice ? '⚠️ ВНИМАНИЕ! ТИПОГРАФИЯ НЕДОПОЛУЧАЕТ ' + fmt(r.minPrice - r.typographyRevenue) + ' ₽ ДО МИНИМУМА!\n' : ''}
-${s.note ? 'Комментарий: ' + s.note : ''}`;
-  navigator.clipboard.writeText(txt).then(()=>toast('Смета скопирована в буфер обмена')).catch(err=>toast('Не удалось скопировать: ' + err.message, true));
+Прибыль:            ${fmt(r.typographyProfit)} ₽ (${fmt2(r.typographyMargin)}%)
+${r.typographyRevenue < r.minPrice ? '⚠️ Недополучает '+fmt(r.minPrice-r.typographyRevenue)+' ₽ до минимума!\n' : ''}
+${s.note ? 'Комментарий: '+s.note : ''}`;
+  navigator.clipboard.writeText(txt).then(()=>toast('Скопировано')).catch(err=>toast('Ошибка: '+err.message, true));
 });
 
-const HIST_KEY = 'offset_calc_history';
-const HIST_MAX = 200;
+const HIST_KEY = 'calc_history';
 function getHistory(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); }catch(e){ return []; } }
-function pushHistory(snap){
-  const h = getHistory();
-  h.unshift(snap);
-  localStorage.setItem(HIST_KEY, JSON.stringify(h.slice(0, HIST_MAX)));
-}
+function pushHistory(snap){ const h = getHistory(); h.unshift(snap); localStorage.setItem(HIST_KEY, JSON.stringify(h.slice(0, 200))); }
 function renderHistory(){
   const h = getHistory();
   const box = el('history');
   el('histCount').textContent = h.length;
   if(!h.length){ box.innerHTML = '<div class="empty">Пока пусто</div>'; return; }
-  
   box.innerHTML = h.map((s,i)=>{
-    const histPrice = s.result && s.result.contractPrice !== undefined 
-      ? s.result.contractPrice 
-      : (s.result && s.result.priceClient !== undefined ? s.result.priceClient : 0);
-
-    const bTag = (s.result && s.result.managerBenefit > 0) ? ` · 💰 бенефит ${fmt(s.result.managerBenefit)} ₽` : '';
-    const alarmTag = (s.result && s.result.typographyRevenue < s.result.minPrice) ? ' · ⚠️ АЛАРМ' : '';
-    
+    const price = s.result?.contractPrice || 0;
+    const modeBadge = s.mode === 'digital' ? '<span class="mode-badge dig">цифра</span>' : '<span class="mode-badge off">офсет</span>';
+    const benefitTag = s.result?.managerBenefit > 0 ? ` · 💰 ${fmt(s.result.managerBenefit)}` : '';
+    const alarmTag = s.result && s.result.typographyRevenue < s.result.minPrice ? ' · ⚠️' : '';
     return `<div class="hist-item">
-      <div class="hist-main">
-        <b>${escHtml(s.client || 'Без клиента')}</b>
-        <small>${escHtml(s.savedAtLocal)} · ${escHtml(s.employee||'')} · ${escHtml(s.summary||'')}${bTag}${alarmTag}</small>
-      </div>
-      <div class="hist-price">${fmt(histPrice)} ₽</div>
-      <button class="icon-btn" data-load="${i}" title="Загрузить расчёт">↩</button>
-      <button class="icon-btn" data-del="${i}" title="Удалить">✕</button>
+      <div class="hist-main">${modeBadge}<b>${escHtml(s.client||'Без клиента')}</b>
+      <small>${escHtml(s.savedAtLocal)} · ${escHtml(s.employee||'')} · ${escHtml(s.summary||'')}${benefitTag}${alarmTag}</small></div>
+      <div class="hist-price">${fmt(price)} ₽</div>
+      <button class="icon-btn" data-del="${i}">✕</button>
     </div>`;
   }).join('');
-  
-  box.querySelectorAll('[data-load]').forEach(b=>{
-    b.addEventListener('click', ()=>{
-      const snap = getHistory()[+b.dataset.load];
-      if(!snap) return;
-      el('employee').value = snap.employee || el('employee').value;
-      el('clientName').value = snap.client || '';
-      el('note').value = snap.note || '';
-      applyInputs(snap.inputs);
-      el('detailBlock').open = true;
-      toast('Расчёт загружен');
-      window.scrollTo({top:0, behavior:'smooth'});
-    });
-  });
   box.querySelectorAll('[data-del]').forEach(b=>{
     b.addEventListener('click', ()=>{
-      const h2 = getHistory();
-      h2.splice(+b.dataset.del, 1);
-      localStorage.setItem(HIST_KEY, JSON.stringify(h2));
-      renderHistory();
-      toast('Удалено из истории');
+      const h2 = getHistory(); h2.splice(+b.dataset.del, 1);
+      localStorage.setItem(HIST_KEY, JSON.stringify(h2)); renderHistory();
     });
   });
 }
 
-document.getElementById('product').addEventListener('change', updateUI);
-FIELD_IDS.concat(CHK_IDS).forEach(id=>{
-  const e = el(id);
-  if(!e) return;
-  e.addEventListener('input', render);
-  e.addEventListener('change', render);
-});
-['markup','minMargin','contractPrice','managerBenefit'].forEach(id=>{
-  const e = el(id); if(!e) return;
-  e.addEventListener('input', render);
-  e.addEventListener('change', render);
-});
-['clientName','note'].forEach(id=>{ el(id).addEventListener('input', render); });
+el('product').addEventListener('change', updateUI);
+el('d-product').addEventListener('change', updateUI);
 
-['saveHtml', 'saveJson', 'saveCsv'].forEach(id => {
-  el(id).addEventListener('change', savePrefs);
-  el(id).addEventListener('change', () => {
-    el(id).closest('.chk').classList.toggle('on', el(id).checked);
-  });
+[
+  'qty',
+  'leaflet-format','leaflet-paper','leaflet-color','leaflet-lam',
+  'brochure-format','brochure-pages','brochure-paper','brochure-color',
+  'brochure-cover-paper','brochure-cover-color','brochure-cover-lam','brochure-binding',
+  'book-format','book-pages','book-paper','book-color',
+  'book-cover-paper','book-cover-color','book-cover-lam','book-binding',
+  'd-qty',
+  'd-leaflet-format','d-leaflet-paper','d-leaflet-color','d-leaflet-lam',
+  'd-brochure-format','d-brochure-pages','d-brochure-paper','d-brochure-color',
+  'd-brochure-cover-paper','d-brochure-cover-color','d-brochure-cover-lam','d-brochure-binding',
+  'd-book-format','d-book-pages','d-book-paper','d-book-color',
+  'd-book-cover-paper','d-book-cover-color','d-book-cover-lam','d-book-binding',
+  'markup','minMargin','contractPrice','managerBenefit'
+].forEach(id=>{
+  const e = el(id); if(!e) return;
+  e.addEventListener('input', render); e.addEventListener('change', render);
 });
+['selfTurn','cut','crease','fold','d-cut','d-crease','d-fold'].forEach(id=>{
+  const e = el(id); if(!e) return;
+  e.addEventListener('change', render);
+});
+['clientName','note'].forEach(id => el(id).addEventListener('input', render));
 
 document.querySelectorAll('.chk input').forEach(i=>{
   const sync = () => i.closest('.chk').classList.toggle('on', i.checked);
-  i.addEventListener('change', sync);
-  sync();
+  i.addEventListener('change', sync); sync();
 });
 
 (async function init(){
-  loadEmployees();
-  renderHistory();
-  renderSettings();
-  updateFolderUI();
-
-  const prefs = loadPrefs();
-  if(prefs.saveHtml !== undefined) el('saveHtml').checked = prefs.saveHtml;
-  if(prefs.saveJson !== undefined) el('saveJson').checked = prefs.saveJson;
-  if(prefs.saveCsv !== undefined) el('saveCsv').checked = prefs.saveCsv;
-  
-  document.querySelectorAll('.chk input').forEach(i=>{
-    i.closest('.chk').classList.toggle('on', i.checked);
-  });
-
+  loadEmployees(); renderHistory(); updateFolderUI();
   if(FSA_SUPPORTED){
-    try{
-      const h = await kvGet('dirHandle');
-      if(h){
-        dirHandle = h;
-        const perm = await h.queryPermission({ mode:'readwrite' });
-        updateFolderUI();
-        if(perm !== 'granted') el('folderBtn').title = 'Папка «' + h.name + '» — нажмите, чтобы подтвердить доступ';
-      }
-    }catch(e){ /* ignore */ }
+    try{ const h = await kvGet('dirHandle'); if(h){ dirHandle = h; updateFolderUI(); } }catch(e){}
   }
-  updateUI();
-  if(!FSA_SUPPORTED){
-    setTimeout(()=>toast('Браузер не поддерживает выбор папки — используйте Chrome или Edge', true), 900);
-  }
+  setMode('offset');
 })();
 </script>
 </body>
