@@ -437,14 +437,18 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
       <details id="detailBlock"><summary>Полная детализация</summary><div id="rows"></div></details>
 
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-        <button class="btn primary" id="saveBtn" style="flex:1;padding:12px">💾 Сохранить (Excel)</button>
+        <button class="btn primary" id="saveBtn" style="flex:1;padding:12px">💾 Добавить в журнал</button>
         <button class="btn" id="printBtn" style="flex:1;padding:12px">🖨 Печать / PDF</button>
         <button class="btn" id="copyBtn" style="flex:1;padding:12px">📋 Скопировать</button>
       </div>
     </div>
 
+    <!-- ИСТОРИЯ С КНОПКОЙ ВЫГРУЗКИ -->
     <div class="card hist-card">
-      <h3>История <span class="badge" id="histCount">0</span></h3>
+      <h3 style="display:flex; justify-content:space-between; align-items:center;">
+        <span>Журнал расчетов <span class="badge" id="histCount">0</span></span>
+        <button class="btn" id="exportAllBtn" style="font-size:12px; padding:6px 12px; background:#eaf7ee; color:#1a7f37; border-color:#b7e4c7;">📥 Выгрузить всё в Excel</button>
+      </h3>
       <div id="history"><div class="empty">Пока пусто</div></div>
     </div>
   </div>
@@ -1142,88 +1146,112 @@ function buildSnapshot(){
   };
 }
 
-// Генерация Excel через HTML таблицу (не требует библиотек)
-function buildExcelHtml(snap) {
-  const r = snap.result;
+// --- ФУНКЦИЯ ДОПИСЫВАНИЯ В ОБЩИЙ CSV ЖУРНАЛ ---
+async function appendToJournal(snap) {
+  if (!dirHandle) return false;
+  const fileName = 'Журнал_расчетов.csv';
+  try {
+    let fileHandle;
+    try {
+      fileHandle = await dirHandle.getFileHandle(fileName);
+    } catch (e) {
+      fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+      const header = '\uFEFF"Дата";"Сотрудник";"Клиент";"Параметры";"Себестоимость";"Оборот";"Бенефит";"Доход";"Маржа %";"Комментарий"\n';
+      const writable = await fileHandle.createWritable();
+      await writable.write(header);
+      await writable.close();
+    }
+    
+    // Читаем существующий файл, чтобы дописать в конец
+    const file = await fileHandle.getFile();
+    const text = await file.text();
+    
+    const r = snap.result;
+    const row = `"${snap.savedAtLocal}";"${snap.employee}";"${snap.client || '—'}";"${snap.summary}";"${r.cost}";"${r.typographyRevenue}";"${r.managerBenefit}";"${r.typographyProfit}";"${r.typographyMargin}";"${snap.note || ''}"\n`;
+    
+    const writable = await fileHandle.createWritable();
+    await writable.write(text + row);
+    await writable.close();
+    return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
+}
+
+// --- ФУНКЦИЯ ВЫГРУЗКИ ВСЕЙ ИСТОРИИ В ОДИН EXCEL ---
+function exportWholeHistory() {
+  const h = getHistory();
+  if (!h.length) { toast('Журнал пуст', true); return; }
+  
   let xml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
   <head><meta charset="utf-8">
-  <!--[if gte mso 9]>
-  <xml>
-    <x:ExcelWorkbook>
-      <x:ExcelWorksheets>
-        <x:ExcelWorksheet>
-          <x:Name>Смета</x:Name>
-          <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
-        </x:ExcelWorksheet>
-      </x:ExcelWorksheets>
-    </x:ExcelWorkbook>
-  </xml>
-  <![endif]-->
   <style>
     table { border-collapse: collapse; font-family: Arial, sans-serif; font-size: 10pt; }
     th { background-color: #FCF2F5; color: #8B1C42; font-weight: bold; border: 1px solid #E5CCD5; padding: 6px; text-align: left; }
     td { border: 1px solid #E5CCD5; padding: 6px; }
-    .title { font-size: 14pt; font-weight: bold; color: #8B1C42; }
-    .bold { font-weight: bold; }
     .green { color: #1a7f37; font-weight: bold; }
     .right { text-align: right; }
   </style>
-  </head>
-  <body>
-  <table>
-    <tr><td colspan="4" class="title">Расчет стоимости печати</td></tr>
-    <tr><td class="bold">Клиент:</td><td colspan="3">${snap.client || '—'}</td></tr>
-    <tr><td class="bold">Менеджер:</td><td colspan="3">${snap.employee}</td></tr>
-    <tr><td class="bold">Дата:</td><td colspan="3">${snap.savedAtLocal}</td></tr>
-    <tr><td class="bold">Параметры:</td><td colspan="3">${snap.summary}</td></tr>
-    <tr><td colspan="4"></td></tr>
-    
-    <tr><th colspan="2">ФИНАНСОВЫЙ ИТОГ</th><th class="right">Сумма, ₽</th><th></th></tr>
-    <tr><td colspan="2">Себестоимость</td><td class="right">${r.cost}</td><td></td></tr>
-    <tr><td colspan="2">Оборот по проекту</td><td class="right">${r.typographyRevenue}</td><td></td></tr>
-    <tr><td colspan="2">Бенефит менеджера</td><td class="right">${r.managerBenefit}</td><td></td></tr>
-    <tr><td colspan="2" class="bold">Доход типографии</td><td class="right green">${r.typographyProfit}</td><td></td></tr>
-    <tr><td colspan="2">Маржа типографии, %</td><td class="right">${r.typographyMargin}%</td><td></td></tr>
-    <tr><td colspan="4"></td></tr>
-    
-    <tr><th>Раздел</th><th>Статья</th><th>Значение</th><th>Детали</th></tr>`;
-    
-  snap.rows.forEach(row => {
-    xml += `<tr><td>${row.section}</td><td>${row.label}</td><td class="right">${row.value}</td><td>${row.detail || ''}</td></tr>`;
-  });
+  </head><body><table>
+  <tr>
+    <th>Дата</th>
+    <th>Сотрудник</th>
+    <th>Клиент</th>
+    <th>Параметры</th>
+    <th class="right">Себестоимость</th>
+    <th class="right">Оборот</th>
+    <th class="right">Бенефит</th>
+    <th class="right">Доход</th>
+    <th class="right">Маржа %</th>
+    <th>Комментарий</th>
+  </tr>`;
   
+  h.forEach(s => {
+    const r = s.result || {};
+    xml += `<tr>
+      <td>${s.savedAtLocal}</td>
+      <td>${s.employee}</td>
+      <td>${s.client || '—'}</td>
+      <td>${s.summary}</td>
+      <td class="right">${r.cost || 0}</td>
+      <td class="right">${r.typographyRevenue || 0}</td>
+      <td class="right">${r.managerBenefit || 0}</td>
+      <td class="right green">${r.typographyProfit || 0}</td>
+      <td class="right">${r.typographyMargin || 0}</td>
+      <td>${s.note || ''}</td>
+    </tr>`;
+  });
   xml += `</table></body></html>`;
-  return '\uFEFF' + xml; // BOM для правильной кодировки в Excel
+  
+  const baseName = `Общий_журнал_расчетов_${fileStamp(new Date())}.xls`;
+  downloadFile(baseName, '\uFEFF' + xml, 'application/vnd.ms-excel;charset=utf-8');
+  toast('Общий журнал выгружен!');
 }
 
 async function saveCalc(){
   const snap = buildSnapshot();
-  const baseName = safeName(`${fileStamp(new Date())}_${snap.employee}_${snap.client || 'без клиента'}`);
   
-  const html = buildExcelHtml(snap);
-  // Тип application/vnd.ms-excel заставляет Excel открывать файл как родной xls
-  const mimeType = 'application/vnd.ms-excel;charset=utf-8';
-
-  const dir = await ensureDir();
-  
-  if(dir){
-    try{
-      await writeFile(baseName+'.xls', html, mimeType);
-      toast(`Файл Excel сохранен в «${dir.name}»`);
-    }catch(e){ 
-      toast('Ошибка записи файла: '+e.message, true); 
-    }
-  } else {
-    downloadFile(baseName+'.xls', html, mimeType);
-    toast('Excel-файл скачан в «Загрузки»');
-  }
-  
+  // 1. Всегда сохраняем в локальную историю (на экране)
   pushHistory(snap); 
   renderHistory();
+  
+  // 2. Пытаемся дописать в файл (если выбрана папка)
+  if (dirHandle) {
+    const success = await appendToJournal(snap);
+    if (success) {
+      toast('Строчка добавлена в общий файл Журнал_расчетов.csv');
+    } else {
+      toast('Ошибка записи в файл, но добавлено в Историю', true);
+    }
+  } else {
+    toast('Сохранено в Историю. Выберите папку, чтобы вести файл.');
+  }
 }
 
 el('folderBtn').addEventListener('click', pickFolder);
 el('saveBtn').addEventListener('click', saveCalc);
+el('exportAllBtn').addEventListener('click', exportWholeHistory);
 el('printBtn').addEventListener('click', () => window.print());
 el('copyBtn').addEventListener('click', () => {
   const s = buildSnapshot(); const r = s.result;
