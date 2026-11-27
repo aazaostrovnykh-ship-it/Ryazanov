@@ -150,6 +150,7 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
             <div><label class="fld">Красочность</label>
               <select id="leaflet-color">
                 <option value="1+0">1+0</option><option value="1+1">1+1</option>
+                <option value="2+0">2+0</option><option value="2+2">2+2</option>
                 <option value="4+0">4+0</option><option value="4+4" selected>4+4</option>
               </select></div>
             <div><label class="fld">Ламинация</label>
@@ -176,7 +177,9 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
               </select></div>
             <div><label class="fld">Красочность блока</label>
               <select id="brochure-color">
-                <option value="1+0">1+0</option><option value="1+1" selected>1+1</option><option value="4+4">4+4</option>
+                <option value="1+0">1+0</option><option value="1+1" selected>1+1</option>
+                <option value="2+0">2+0</option><option value="2+2">2+2</option>
+                <option value="4+0">4+0</option><option value="4+4">4+4</option>
               </select></div>
           </div>
           <h4 class="divider">Обложка, переплет, ламинация</h4>
@@ -186,7 +189,9 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
                 <option value="120" selected>Мелов. 120</option><option value="250">Мелов. 250</option><option value="300">Мелов. 300</option>
               </select></div>
             <div><label class="fld">Красочность обложки</label>
-              <select id="brochure-cover-color"><option value="4+0" selected>4+0</option><option value="4+4">4+4</option></select></div>
+              <select id="brochure-cover-color"><option value="1+0">1+0</option><option value="1+1">1+1</option>
+                <option value="2+0">2+0</option><option value="2+2">2+2</option>
+                <option value="4+0" selected>4+0</option><option value="4+4">4+4</option></select></div>
             <div><label class="fld">Ламинация обложки</label>
               <select id="brochure-cover-lam">
                 <option value="0" selected>Без ламинации</option>
@@ -219,7 +224,9 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
               </select></div>
             <div><label class="fld">Красочность блока</label>
               <select id="book-color">
-                <option value="1+0">1+0</option><option value="1+1" selected>1+1</option><option value="4+4">4+4</option>
+                <option value="1+0">1+0</option><option value="1+1" selected>1+1</option>
+                <option value="2+0">2+0</option><option value="2+2">2+2</option>
+                <option value="4+0">4+0</option><option value="4+4">4+4</option>
               </select></div>
           </div>
           <h4 class="divider">Обложка, переплет, ламинация</h4>
@@ -229,7 +236,9 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
                 <option value="120">Мелов. 120</option><option value="250" selected>Мелов. 250</option><option value="300">Мелов. 300</option>
               </select></div>
             <div><label class="fld">Красочность обложки</label>
-              <select id="book-cover-color"><option value="4+0" selected>4+0</option><option value="4+4">4+4</option></select></div>
+              <select id="book-cover-color"><option value="1+0">1+0</option><option value="1+1">1+1</option>
+                <option value="2+0">2+0</option><option value="2+2">2+2</option>
+                <option value="4+0" selected>4+0</option><option value="4+4">4+4</option></select></div>
             <div><label class="fld">Ламинация обложки</label>
               <select id="book-cover-lam">
                 <option value="0">Без ламинации</option><option value="10" selected>1 сторона</option><option value="20">2 стороны</option>
@@ -311,7 +320,9 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
                 <option value="250">250</option><option value="300" selected>300</option>
               </select></div>
             <div><label class="fld">Красочность обложки</label>
-              <select id="d-brochure-cover-color"><option value="4+0" selected>4+0</option><option value="4+4">4+4</option></select></div>
+              <select id="d-brochure-cover-color"><option value="1+0">1+0</option><option value="1+1">1+1</option>
+                <option value="2+0">2+0</option><option value="2+2">2+2</option>
+                <option value="4+0" selected>4+0</option><option value="4+4">4+4</option></select></div>
             <div><label class="fld">Ламинация обложки</label>
               <select id="d-brochure-cover-lam">
                 <option value="0" selected>Без ламинации</option>
@@ -351,7 +362,9 @@ details summary::before{content:'▸ ';display:inline-block;transition:.2s}detai
                 <option value="250">250</option><option value="300" selected>300</option>
               </select></div>
             <div><label class="fld">Красочность обложки</label>
-              <select id="d-book-cover-color"><option value="4+0" selected>4+0</option><option value="4+4">4+4</option></select></div>
+              <select id="d-book-cover-color"><option value="1+0">1+0</option><option value="1+1">1+1</option>
+                <option value="2+0">2+0</option><option value="2+2">2+2</option>
+                <option value="4+0" selected>4+0</option><option value="4+4">4+4</option></select></div>
             <div><label class="fld">Ламинация обложки</label>
               <select id="d-book-cover-lam">
                 <option value="0">Нет</option><option value="lam1" selected>1 сторона</option><option value="lam2">2 стороны</option>
@@ -489,7 +502,11 @@ function toast(msg, isErr){
 
 const DEFAULT_CFG = {
   platePrice: 500, wastePerForm: 50,
-  printPrices: {'1+0':2,'1+1':4,'4+0':8,'4+4':16},
+  // Тарифы за один прогон А2 из листа 1 книги «Цифра.xls»:
+  // 1+0 = F19/B1; 2+0 = G19/B1; 4+0 = G5/B1.
+  // Двусторонние режимы используют два прогона соответствующей односторонней красочности.
+  offsetRates: {'1+0': 2649.19864937372/15000, '2+0': 3233.72829563218/15000, '4+0': 16309.1823348814/15000},
+  printPrices: {'1+0':2,'1+1':4,'2+0':4,'2+2':8,'4+0':8,'4+4':16},
   paper: {
     '80':  { name:'ВХИ 80 г/м²', packSize:1000, packCost:1890, packPrice:3250 },
     '120': { name:'Мелованная 120 г/м²', packSize:500, packCost:1600, packPrice:3000 },
@@ -580,11 +597,21 @@ function setByPath(obj, path, val){
   o[parts[parts.length-1]] = val;
 }
 
+function colorBase(color){
+  if(color.startsWith('1+')) return '1+0';
+  if(color.startsWith('2+')) return '2+0';
+  return '4+0';
+}
+function printSides(color){ return color.endsWith('+0') ? 1 : 2; }
+function pressName(color){
+  return colorBase(color) === '4+0' ? 'Четырёхкрасочная машина' : 'Двухкрасочная машина';
+}
+function offsetPrintRate(color){
+  return num(CFG.offsetRates && CFG.offsetRates[colorBase(color)], 0);
+}
 function platesPerSheet(color, selfTurn){
-  let front = 0;
-  if(color === '1+0' || color === '1+1') front = 1;
-  if(color === '4+0' || color === '4+4') front = 4;
-  const back = (color === '1+1' || color === '4+4') ? front : 0;
+  const front = colorBase(color) === '1+0' ? 1 : colorBase(color) === '2+0' ? 2 : 4;
+  const back = printSides(color) === 2 ? front : 0;
   return front + (selfTurn ? 0 : back);
 }
 
@@ -610,7 +637,7 @@ function computeOffset(){
     const cCover = el(isBook?'book-cover-color':'brochure-cover-color').value;
     const binding = el(isBook?'book-binding':'brochure-binding').value;
     const lamKey = isBook ? el('book-cover-lam').value : el('brochure-cover-lam').value;
-    summary = `${isBook?'Книга':'Брошюра'} · ${format} · ${pages} стр. · ${qty} экз.`;
+    summary = `${isBook?'Книга':'Брошюра'} · ${format} · ${pages} стр. · блок ${cBlock} (${pressName(cBlock)}) · ${qty} экз.`;
 
     const pagesPerSheet = CFG.pagesPerA2[format];
     const sheetsPerCopy = Math.ceil(pages / pagesPerSheet);
@@ -620,14 +647,15 @@ function computeOffset(){
     const totalBlockSheets = cleanBlockSheets + wasteBlockSheets;
     const pb = CFG.paper[pBlock];
     const packsBlock = Math.ceil(totalBlockSheets / pb.packSize);
-    const printCostBlock = cleanBlockSheets * CFG.printPrices[cBlock];
+    const rateBlock = offsetPrintRate(cBlock);
+    const printCostBlock = cleanBlockSheets * rateBlock * printSides(cBlock);
     const paperCostBlock = packsBlock * pb.packCost;
     const platesCostBlock = platesBlock * CFG.platePrice;
     retailPaper += packsBlock * pb.packPrice;
 
     push('Блок','Листов А2', fmt(cleanBlockSheets)+' шт', `${sheetsPerCopy} × ${fmt(qty)}`);
     push('Блок','Приладка', fmt(wasteBlockSheets)+' шт');
-    push('Блок','Печать', fmt(printCostBlock)+' ₽', `${fmt(cleanBlockSheets)} × ${CFG.printPrices[cBlock]} ₽`);
+    push('Блок','Печать', fmt(printCostBlock)+' ₽', `${fmt(cleanBlockSheets)} × ${rateBlock.toFixed(4)} ₽ × ${printSides(cBlock)} стороны; ${pressName(cBlock)}`);
     push('Блок','Бумага', fmt(paperCostBlock)+' ₽', `${packsBlock} пач. × ${fmt(pb.packCost)} ₽`);
     push('Блок','Формы', fmt(platesCostBlock)+' ₽', `${platesBlock} × ${CFG.platePrice} ₽`);
 
@@ -638,13 +666,14 @@ function computeOffset(){
     const totalCoverSheets = cleanCoverSheets + wasteCoverSheets;
     const pc = CFG.paper[pCover];
     const packsCover = Math.ceil(totalCoverSheets / pc.packSize);
-    const printCostCover = cleanCoverSheets * CFG.printPrices[cCover];
+    const rateCover = offsetPrintRate(cCover);
+    const printCostCover = cleanCoverSheets * rateCover * printSides(cCover);
     const paperCostCover = packsCover * pc.packCost;
     const platesCostCover = platesCover * CFG.platePrice;
     retailPaper += packsCover * pc.packPrice;
 
     push('Обложка','Листов А2', fmt(cleanCoverSheets)+' шт');
-    push('Обложка','Печать', fmt(printCostCover)+' ₽', `${fmt(cleanCoverSheets)} × ${CFG.printPrices[cCover]} ₽`);
+    push('Обложка','Печать', fmt(printCostCover)+' ₽', `${fmt(cleanCoverSheets)} × ${rateCover.toFixed(4)} ₽ × ${printSides(cCover)} стороны; ${pressName(cCover)}`);
     push('Обложка','Бумага', fmt(paperCostCover)+' ₽', `${packsCover} пач. × ${fmt(pc.packCost)} ₽`);
     push('Обложка','Формы', fmt(platesCostCover)+' ₽', `${platesCover} × ${CFG.platePrice} ₽`);
 
@@ -673,7 +702,7 @@ function computeOffset(){
     const paper = el('leaflet-paper').value;
     const color = el('leaflet-color').value;
     const lamVal = parseInt(el('leaflet-lam').value, 10) || 0;
-    summary = `Листовки · ${format} · ${color} · ${qty} шт.`;
+    summary = `Листовки · ${format} · ${color} · ${pressName(color)} · ${qty} шт.`;
 
     const itemsPerA2 = CFG.itemsPerA2[format];
     const cleanSheets = Math.ceil(qty / itemsPerA2);
@@ -682,7 +711,8 @@ function computeOffset(){
     const totalSheets = cleanSheets + wasteSheets;
     const pd = CFG.paper[paper];
     const packs = Math.ceil(totalSheets / pd.packSize);
-    const printCost = cleanSheets * CFG.printPrices[color];
+    const rate = offsetPrintRate(color);
+    const printCost = cleanSheets * rate * printSides(color);
     const paperCost = packs * pd.packCost;
     const platesCost = plates * CFG.platePrice;
     const cutCost = isCut ? cleanSheets * CFG.cut : 0;
@@ -693,7 +723,7 @@ function computeOffset(){
 
     push('Печать','Листов А2', fmt(cleanSheets)+' шт');
     push('Печать','Приладка', fmt(wasteSheets)+' шт');
-    push('Печать','Печать (работа)', fmt(printCost)+' ₽', `${fmt(cleanSheets)} × ${CFG.printPrices[color]} ₽`);
+    push('Печать','Печать (работа)', fmt(printCost)+' ₽', `${fmt(cleanSheets)} × ${rate.toFixed(4)} ₽ × ${printSides(color)} стороны; ${pressName(color)}`);
     push('Печать','Бумага', fmt(paperCost)+' ₽', `${packs} пач. × ${fmt(pd.packCost)} ₽`);
     push('Печать','Формы', fmt(platesCost)+' ₽', `${plates} × ${CFG.platePrice} ₽`);
 
@@ -740,7 +770,7 @@ function computeDigital(){
     const cCover = el(isBook?'d-book-cover-color':'d-brochure-cover-color').value;
     const binding = el(isBook?'d-book-binding':'d-brochure-binding').value;
     const lamKey = isBook ? el('d-book-cover-lam').value : el('d-brochure-cover-lam').value;
-    summary = `${isBook?'Книга':'Брошюра'} · ${format} · ${pages} стр. · ${qty} экз.`;
+    summary = `${isBook?'Книга':'Брошюра'} · ${format} · ${pages} стр. · блок ${cBlock} (${pressName(cBlock)}) · ${qty} экз.`;
 
     const pagesPerSheet = D.pagesPerA3[format];
     const sheetsPerCopy = Math.ceil(pages / pagesPerSheet);
@@ -810,7 +840,7 @@ function computeDigital(){
     const paper = el('d-leaflet-paper').value;
     const color = el('d-leaflet-color').value;
     const lamKey = el('d-leaflet-lam').value;
-    summary = `Листовки · ${format} · ${color} · ${qty} шт.`;
+    summary = `Листовки · ${format} · ${color} · ${pressName(color)} · ${qty} шт.`;
 
     const itemsPerA3 = D.itemsPerA3[format];
     const sheets = Math.ceil(qty / itemsPerA3);
@@ -994,9 +1024,9 @@ function renderOffsetSettings(box){
   h += cfgInput('Ламинация 1 сторона, ₽/лист', 'lam.lam1', CFG.lam.lam1);
   h += cfgInput('Ламинация 2 стороны, ₽/лист', 'lam.lam2', CFG.lam.lam2);
   h += '</div>';
-  h += '<div class="sec-title">Печать, ₽ за оттиск А2</div><div class="grid">';
-  ['1+0','1+1','4+0','4+4'].forEach(k=>{ h += cfgInput(k, 'printPrices.'+k, CFG.printPrices[k]); });
-  h += '</div>';
+  h += '<div class="sec-title">Себестоимость печати по листу 1 Excel, ₽ за прогон А2</div><div class="grid">';
+  ['1+0','2+0','4+0'].forEach(k=>{ h += cfgInput(k, 'offsetRates.'+k, CFG.offsetRates[k], '0.0001'); });
+  h += '</div><div class="hint">Для двусторонней печати (1+1, 2+2, 4+4) стоимость прогона учитывается за обе стороны. 1+0 и 2+0 — двухкрасочная машина; 4+0 — четырёхкрасочная. Значения можно корректировать.</div>';
   h += '<div class="sec-title">Бумага — закупка и клиентский прайс</div>';
   Object.keys(CFG.paper).forEach(k=>{
     const p = CFG.paper[k];
